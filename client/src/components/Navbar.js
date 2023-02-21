@@ -158,13 +158,10 @@ const Navbar = () => {
                       <a href="#home">home</a>
                     </li>
                     <li className="scroll">
-                      <a href="#new-arrivals">new arrival</a>
+                      <a href="#new-arrivals">highest rated</a>
                     </li>
                     <li className="scroll">
-                      <a href="#feature">features</a>
-                    </li>
-                    <li className="scroll">
-                      <a href="#blog">blog</a>
+                      <a href="#feature">featured</a>
                     </li>
                     <li className="scroll">
                       <a href="#newsletter">contact</a>

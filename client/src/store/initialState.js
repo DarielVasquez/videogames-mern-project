@@ -1,5 +1,7 @@
 const initialState = {
-    products: [],
+    popularProducts: [],
+    latestProducts: [],
+    featuredProducts: [],
     isLoading: false,
     error: null,
   };

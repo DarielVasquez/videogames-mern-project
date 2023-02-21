@@ -1,253 +1,148 @@
 import React, {useEffect} from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductsStart, fetchProductsSuccess, fetchProductsFailure } from '../actions'
+import { fetchProducts } from '../actions'
+import FeaturedMainPage from "../components/FeaturedMainPage";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const products = useSelector(state => state.products);
-  const isLoading = useSelector(state => state.isLoading);
-  const error = useSelector(state => state.error);
-
-  const fetchProducts = async () => {
-    dispatch(fetchProductsStart());
+  const allPopularProducts = useSelector(state => state.fetchProducts.popularProducts);
+  const allLatestProducts = useSelector(state => state.fetchProducts.latestProducts);
+  const allFeaturedProducts = useSelector(state => state.fetchProducts.featuredProducts);
+  const isLoading = useSelector(state => state.fetchProducts.isLoading);
+  const error = useSelector(state => state.fetchProducts.error);
   
-    try {
-      const response = await fetch('https://api.asindataapi.com/request?api_key=demo&type=search&amazon_domain=amazon.com&search_term=highlighter+pens&sort_by=average_review');
-      const data = await response.json();
-      console.log(data);
-      dispatch(fetchProductsSuccess(data));
-    } catch (error) {
-      dispatch(fetchProductsFailure(error.message));
-    }
-  }
-
   useEffect(() => {
-    fetchProducts();
+    dispatch(fetchProducts());
   }, [dispatch]);
+
+  const popularProducts = allPopularProducts.results;
+  const latestProducts = allLatestProducts.results;
+  const featuredProducts = allFeaturedProducts.results;
+  const featuredSingleProductId = allLatestProducts.results?.[0].id;
+
+  console.log(popularProducts);
+  console.log(latestProducts);
+  console.log(featuredProducts);
 
   if (isLoading) {
     return <div>Loading...</div>;
-  }
+  } else
   return (
     <main>
-      <header id="home" className="welcome-hero">
+      <header id="home" className="welcome-hero"  style={{background:'white'}}>
         <div
           id="header-carousel"
           className="carousel slide carousel-fade"
           data-ride="carousel"
         >
           <ol className="carousel-indicators">
-            <li
-              data-target="#header-carousel"
-              data-slide-to="0"
-              className="active"
-            >
-              <span className="small-circle"></span>
-            </li>
-            <li data-target="#header-carousel" data-slide-to="1">
-              <span className="small-circle"></span>
-            </li>
-            <li data-target="#header-carousel" data-slide-to="2">
-              <span className="small-circle"></span>
-            </li>
-            <li data-target="#header-carousel" data-slide-to="3">
-              <span className="small-circle"></span>
-            </li>
+            {popularProducts?.slice(0,3).map((item, index)=>{
+              const {id} = item;
+              return (            
+              <li key={id} 
+              data-target="#header-carousel" 
+              data-slide-to={index}
+              className={index === 0 ? 'active' : ''}>
+                <span className="small-circle"></span>
+              </li>)
+            })}
           </ol>
 
+          {/* home page */}
           <div className="carousel-inner" role="listbox">
-            <div className="item active">
-              <div className="single-slide-item slide1">
-                <div className="container">
-                  <div className="welcome-hero-content">
-                    <div className="row">
-                      <div className="col-sm-7">
-                        <div className="single-welcome-hero">
-                          <div className="welcome-hero-txt">
-                            <h4>great design collection</h4>
-                            <h2>cloth covered accent chair</h2>
-                            <p>
-                              Lorem ipsum dolor sit amet, consectetur
-                              adipisicing elit, sed do eiuiana smod tempor ut
-                              labore et dolore magna aliqua. Ut enim ad minim
-                              veniam, quis nostrud exercitation ullamco laboris
-                              nisi ut aliquip.
-                            </p>
-                            <div className="packages-price">
-                              <p>
-                                $ 399.00
-                                <del>$ 499.00</del>
-                              </p>
+            {latestProducts?.slice(0,3).map((product, index) => {
+              const {id, name, background_image, price, description, platforms} = product;
+              return (
+                <div key={id} className={`item ${index === 0 && 'active'}`}>
+                  <div className={`single-slide-item slide${index}`}>
+                    <div className="container">
+                      <div className="welcome-hero-content">
+                        <div className="row">
+                          <div className="col-sm-7">
+                            <div className="single-welcome-hero">
+                              <div className="welcome-hero-txt">
+                                <h4>latest releases</h4>
+                                <h2>{name.length > 50 ? `${name.substring(0,50).trim()}...` : name}</h2>
+                                <div>
+                                  Available on these platforms:
+                                  <ul>
+                                  {platforms.map(({platform})=>{
+                                    const {id, name} = platform;
+                                    return (
+                                      <li key={id}>- {name} </li>
+                                    )
+                                  })}
+                                  </ul>
+                                </div>
+                                <button
+                                  className="btn-cart welcome-add-cart"
+                                  // onClick="window.location.href='#'"
+                                >
+                                  <span className="lnr lnr-plus-circle"></span>
+                                  add <span>to</span> cart
+                                </button>
+                                <button
+                                  className="btn-cart welcome-add-cart welcome-more-info"
+                                  // onClick="window.location.href='#'"
+                                >
+                                  more info
+                                </button>
+                              </div>
                             </div>
-                            <button
-                              className="btn-cart welcome-add-cart"
-                              // onClick="window.location.href='#'"
-                            >
-                              <span className="lnr lnr-plus-circle"></span>
-                              add <span>to</span> cart
-                            </button>
-                            <button
-                              className="btn-cart welcome-add-cart welcome-more-info"
-                              // onClick="window.location.href='#'"
-                            >
-                              more info
-                            </button>
                           </div>
-                        </div>
-                      </div>
-                      <div className="col-sm-5">
-                        <div className="single-welcome-hero">
-                          <div className="welcome-hero-img">
-                            <img
-                              src="assets/images/slider/slider1.png"
-                              alt="slider image"
-                            />
+                          <div className="col-sm-5">
+                            <div className="single-welcome-hero">
+                              <div className="welcome-hero-img">
+                                <img
+                                  src={background_image}
+                                  alt={name}
+                                  style={{objectFit:'cover', height:'300px'}}
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="item">
-              <div className="single-slide-item slide2">
-                <div className="container">
-                  <div className="welcome-hero-content">
-                    <div className="row">
-                      <div className="col-sm-7">
-                        <div className="single-welcome-hero">
-                          <div className="welcome-hero-txt">
-                            <h4>great design collection</h4>
-                            <h2>mapple wood accent chair</h2>
-                            <p>
-                              Lorem ipsum dolor sit amet, consectetur
-                              adipisicing elit, sed do eiuiana smod tempor ut
-                              labore et dolore magna aliqua. Ut enim ad minim
-                              veniam, quis nostrud exercitation ullamco laboris
-                              nisi ut aliquip.
-                            </p>
-                            <div className="packages-price">
-                              <p>
-                                $ 199.00
-                                <del>$ 299.00</del>
-                              </p>
-                            </div>
-                            <button
-                              className="btn-cart welcome-add-cart"
-                              // onClick="window.location.href='#'"
-                            >
-                              <span className="lnr lnr-plus-circle"></span>
-                              add <span>to</span> cart
-                            </button>
-                            <button
-                              className="btn-cart welcome-add-cart welcome-more-info"
-                              // onClick="window.location.href='#'"
-                            >
-                              more info
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-sm-5">
-                        <div className="single-welcome-hero">
-                          <div className="welcome-hero-img">
-                            <img
-                              src="assets/images/slider/slider2.png"
-                              alt="slider image"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="item">
-              <div className="single-slide-item slide3">
-                <div className="container">
-                  <div className="welcome-hero-content">
-                    <div className="row">
-                      <div className="col-sm-7">
-                        <div className="single-welcome-hero">
-                          <div className="welcome-hero-txt">
-                            <h4>great design collection</h4>
-                            <h2>valvet accent arm chair</h2>
-                            <p>
-                              Lorem ipsum dolor sit amet, consectetur
-                              adipisicing elit, sed do eiuiana smod tempor ut
-                              labore et dolore magna aliqua. Ut enim ad minim
-                              veniam, quis nostrud exercitation ullamco laboris
-                              nisi ut aliquip.
-                            </p>
-                            <div className="packages-price">
-                              <p>
-                                $ 299.00
-                                <del>$ 399.00</del>
-                              </p>
-                            </div>
-                            <button
-                              className="btn-cart welcome-add-cart"
-                              // onClick="window.location.href='#'"
-                            >
-                              <span className="lnr lnr-plus-circle"></span>
-                              add <span>to</span> cart
-                            </button>
-                            <button
-                              className="btn-cart welcome-add-cart welcome-more-info"
-                              // onClick="window.location.href='#'"
-                            >
-                              more info
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-sm-5">
-                        <div className="single-welcome-hero">
-                          <div className="welcome-hero-img">
-                            <img
-                              src="assets/images/slider/slider3.png"
-                              alt="slider image"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              )
+            })}
           </div>
         </div>
       </header>
 
-      <section id="populer-products" className="populer-products">
+      {/* popular products */}
+      <section id="populer-products" className="populer-products" style={{background:'#f8f9fc', padding:'50px 0'}}>
         <div className="container">
           <div className="populer-products-content">
             <div className="row">
-              <div className="col-md-3">
-                <div className="single-populer-products">
-                  <div className="single-populer-product-img mt40">
-                    <img
-                      src="assets/images/populer-products/p1.png"
-                      alt="populer-products images"
-                    />
+              {latestProducts?.slice(3,7).map((product)=>{
+                const {id, name, background_image, price, description} = product;
+                return (
+                  <div key={id} className="col-md-3">
+                    <div className="single-populer-products" style={{background:'white', padding: '10px 10px 15px 10px'}}>
+                      <div className="single-populer-product-img mt20" style={{height:'200px', position:'relative'}}>
+                        <img
+                          src={background_image}
+                          alt={name}
+                          style={{height: '200px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', objectFit: 'cover'}}
+                        />
+                      </div>
+                      <h2>
+                        <a href="#" style={{whiteSpace: 'nowrap', overflow: 'hidden', display: 'block',textOverflow: 'ellipsis'}}>{name}</a>
+                      </h2>
+                      <div className="single-populer-products-para">
+                        <p>
+                          Lorem ipsum dolor, sit amet consectetur adipisicing elit. In velit possimus nesciunt suscipit nostrum vitae eveniet architecto atque vero perspiciatis, tenetur beatae nulla quas praesentium, minima debitis facere et hic.
+                          {/* {description.length > 50 ? `${description.substring(0,50).trim()}...` : description} */}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <h2>
-                    <a href="#">arm chair</a>
-                  </h2>
-                  <div className="single-populer-products-para">
-                    <p>
-                      Nemo enim ipsam voluptatem quia volu ptas sit asperna aut
-                      odit aut fugit.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6">
+                )
+              })}
+              {/* <div className="col-md-6">
                 <div className="single-populer-products">
                   <div className="single-inner-populer-products">
                     <div className="row">
@@ -287,329 +182,61 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="col-md-3">
-                <div className="single-populer-products">
-                  <div className="single-populer-products">
-                    <div className="single-populer-product-img">
-                      <img
-                        src="assets/images/populer-products/p3.png"
-                        alt="populer-products images"
-                      />
-                    </div>
-                    <h2>
-                      <a href="#">hanging lamp</a>
-                    </h2>
-                    <div className="single-populer-products-para">
-                      <p>
-                        Nemo enim ipsam voluptatem quia volu ptas sit asperna
-                        aut odit aut fugit.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
       </section>
 
+      {/* highest rated */}
       <section id="new-arrivals" className="new-arrivals">
         <div className="container">
           <div className="section-header">
-            <h2>new arrivals</h2>
+            <h2>highest rated</h2>
           </div>
           <div className="new-arrivals-content">
             <div className="row">
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals1.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="sale bg-1">
-                      <p>sale</p>
-                    </div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
-                    </div>
-                  </div>
-                  <h4>
-                    <a href="#">wooden chair</a>
-                  </h4>
-                  <p className="arrival-product-price">$65.00</p>
-                </div>
-              </div>
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals2.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="sale bg-2">
-                      <p>sale</p>
-                    </div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
+              {popularProducts?.slice(0,8).map((product)=>{
+                const {id, name, background_image} = product;
+                return (
+                  <div key={id} className="col-md-3 col-sm-4">
+                    <div className="single-new-arrival">
+                      <div className="single-new-arrival-bg" style={{background:'white'}}>
+                        <img
+                          src={background_image}
+                          alt={name}
+                          style={{height:'250px',objectFit:'cover'}}
+                        />
+                        <div className="single-new-arrival-bg-overlay"></div>
+                        <div className="new-arrival-cart">
+                          <p>
+                            <span className="lnr lnr-cart"></span>
+                            <a href="#">
+                              add <span>to </span> cart
+                            </a>
+                          </p>
+                          <p className="arrival-review pull-right">
+                            <span className="lnr lnr-heart"></span>
+                            <span className="lnr lnr-frame-expand"></span>
+                          </p>
+                        </div>
+                      </div>
+                      <h4>
+                        <a href="#">{name.length > 50 ? `${name.substring(0,50).trim()}...` : name}</a>
+                      </h4>
                     </div>
                   </div>
-                  <h4>
-                    <a href="#">single armchair</a>
-                  </h4>
-                  <p className="arrival-product-price">$80.00</p>
-                </div>
-              </div>
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals3.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
-                    </div>
-                  </div>
-                  <h4>
-                    <a href="#">wooden armchair</a>
-                  </h4>
-                  <p className="arrival-product-price">$40.00</p>
-                </div>
-              </div>
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals4.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="sale bg-1">
-                      <p>sale</p>
-                    </div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
-                    </div>
-                  </div>
-                  <h4>
-                    <a href="#">stylish chair</a>
-                  </h4>
-                  <p className="arrival-product-price">$100.00</p>
-                </div>
-              </div>
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals5.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
-                    </div>
-                  </div>
-                  <h4>
-                    <a href="#">modern chair</a>
-                  </h4>
-                  <p className="arrival-product-price">$120.00</p>
-                </div>
-              </div>
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals6.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="sale bg-1">
-                      <p>sale</p>
-                    </div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
-                    </div>
-                  </div>
-                  <h4>
-                    <a href="#">mapple wood dinning table</a>
-                  </h4>
-                  <p className="arrival-product-price">$140.00</p>
-                </div>
-              </div>
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals7.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="sale bg-2">
-                      <p>sale</p>
-                    </div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
-                    </div>
-                  </div>
-                  <h4>
-                    <a href="#">arm chair</a>
-                  </h4>
-                  <p className="arrival-product-price">$90.00</p>
-                </div>
-              </div>
-              <div className="col-md-3 col-sm-4">
-                <div className="single-new-arrival">
-                  <div className="single-new-arrival-bg">
-                    <img
-                      src="assets/images/collection/arrivals8.png"
-                      alt="new-arrivals images"
-                    />
-                    <div className="single-new-arrival-bg-overlay"></div>
-                    <div className="new-arrival-cart">
-                      <p>
-                        <span className="lnr lnr-cart"></span>
-                        <a href="#">
-                          add <span>to </span> cart
-                        </a>
-                      </p>
-                      <p className="arrival-review pull-right">
-                        <span className="lnr lnr-heart"></span>
-                        <span className="lnr lnr-frame-expand"></span>
-                      </p>
-                    </div>
-                  </div>
-                  <h4>
-                    <a href="#">wooden bed</a>
-                  </h4>
-                  <p className="arrival-product-price">$140.00</p>
-                </div>
-              </div>
+                )
+              })}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="sofa-collection">
-        <div className="owl-carousel owl-theme" id="collection-carousel">
-          <div className="sofa-collection collectionbg1">
-            <div className="container">
-              <div className="sofa-collection-txt">
-                <h2>unlimited sofa collection</h2>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat.
-                </p>
-                <div className="sofa-collection-price">
-                  <h4>
-                    strting from <span>$ 199</span>
-                  </h4>
-                </div>
-                <button
-                  className="btn-cart welcome-add-cart sofa-collection-btn"
-                  // onClick="window.location.href='#'"
-                >
-                  view more
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="sofa-collection collectionbg2">
-            <div className="container">
-              <div className="sofa-collection-txt">
-                <h2>unlimited dainning table collection</h2>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat.
-                </p>
-                <div className="sofa-collection-price">
-                  <h4>
-                    strting from <span>$ 299</span>
-                  </h4>
-                </div>
-                <button
-                  className="btn-cart welcome-add-cart sofa-collection-btn"
-                  // onClick="window.location.href='#'"
-                >
-                  view more
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* featured product main page */}
+      <FeaturedMainPage id={featuredSingleProductId}/>
 
+      {/* featured products */}
       <section id="feature" className="feature">
         <div className="container">
           <div className="section-header">
@@ -617,177 +244,35 @@ const Home = () => {
           </div>
           <div className="feature-content">
             <div className="row">
-              <div className="col-sm-3">
-                <div className="single-feature">
-                  <img
-                    src="assets/images/features/f1.jpg"
-                    alt="feature image"
-                  />
-                  <div className="single-feature-txt text-center">
-                    <p>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <span className="spacial-feature-icon">
-                        <i className="fa fa-star"></i>
-                      </span>
-                      <span className="feature-review">(45 review)</span>
-                    </p>
-                    <h3>
-                      <a href="#">designed sofa</a>
-                    </h3>
-                    <h5>$160.00</h5>
+              {featuredProducts?.slice(0,4).map((product)=>{
+                const {id, name, background_image, ratings_count} = product;
+                return (
+                  <div key={id} className="col-sm-3">
+                    <div className="single-feature">
+                      <img
+                        src={background_image}
+                        alt={name}
+                        style={{height:'250px', objectFit:'cover'}}
+                      />
+                      <div className="single-feature-txt text-center">
+                        <p>
+                          <i className="fa fa-star"></i>
+                          <i className="fa fa-star"></i>
+                          <i className="fa fa-star"></i>
+                          <i className="fa fa-star"></i>
+                          <span className="spacial-feature-icon">
+                            <i className="fa fa-star"></i>
+                          </span>
+                          <span className="feature-review">({ratings_count})</span>
+                        </p>
+                        <h3>
+                          <a href="#">{name.length > 50 ? `${name.substring(0,50).trim()}...` : name}</a>
+                        </h3>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="col-sm-3">
-                <div className="single-feature">
-                  <img
-                    src="assets/images/features/f2.jpg"
-                    alt="feature image"
-                  />
-                  <div className="single-feature-txt text-center">
-                    <p>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <span className="spacial-feature-icon">
-                        <i className="fa fa-star"></i>
-                      </span>
-                      <span className="feature-review">(45 review)</span>
-                    </p>
-                    <h3>
-                      <a href="#">dinning table </a>
-                    </h3>
-                    <h5>$200.00</h5>
-                  </div>
-                </div>
-              </div>
-              <div className="col-sm-3">
-                <div className="single-feature">
-                  <img
-                    src="assets/images/features/f3.jpg"
-                    alt="feature image"
-                  />
-                  <div className="single-feature-txt text-center">
-                    <p>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <span className="spacial-feature-icon">
-                        <i className="fa fa-star"></i>
-                      </span>
-                      <span className="feature-review">(45 review)</span>
-                    </p>
-                    <h3>
-                      <a href="#">chair and table</a>
-                    </h3>
-                    <h5>$100.00</h5>
-                  </div>
-                </div>
-              </div>
-              <div className="col-sm-3">
-                <div className="single-feature">
-                  <img
-                    src="assets/images/features/f4.jpg"
-                    alt="feature image"
-                  />
-                  <div className="single-feature-txt text-center">
-                    <p>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <i className="fa fa-star"></i>
-                      <span className="spacial-feature-icon">
-                        <i className="fa fa-star"></i>
-                      </span>
-                      <span className="feature-review">(45 review)</span>
-                    </p>
-                    <h3>
-                      <a href="#">modern arm chair</a>
-                    </h3>
-                    <h5>$299.00</h5>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="blog" className="blog">
-        <div className="container">
-          <div className="section-header">
-            <h2>latest blog</h2>
-          </div>
-          <div className="blog-content">
-            <div className="row">
-              <div className="col-sm-4">
-                <div className="single-blog">
-                  <div className="single-blog-img">
-                    <img src="assets/images/blog/b1.jpg" alt="blog image" />
-                    <div className="single-blog-img-overlay"></div>
-                  </div>
-                  <div className="single-blog-txt">
-                    <h2>
-                      <a href="#">Why Brands are Looking at Local Language</a>
-                    </h2>
-                    <h3>
-                      By <a href="#">Robert Norby</a> / 18th March 2018
-                    </h3>
-                    <p>
-                      Nemo enim ipsam voluptatem quia voluptas sit aspernatur
-                      aut odit aut fugit, sed quia consequuntur magni dolores
-                      eos qui ratione voluptatem sequi nesciunt....
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="col-sm-4">
-                <div className="single-blog">
-                  <div className="single-blog-img">
-                    <img src="assets/images/blog/b2.jpg" alt="blog image" />
-                    <div className="single-blog-img-overlay"></div>
-                  </div>
-                  <div className="single-blog-txt">
-                    <h2>
-                      <a href="#">Why Brands are Looking at Local Language</a>
-                    </h2>
-                    <h3>
-                      By <a href="#">Robert Norby</a> / 18th March 2018
-                    </h3>
-                    <p>
-                      Nemo enim ipsam voluptatem quia voluptas sit aspernatur
-                      aut odit aut fugit, sed quia consequuntur magni dolores
-                      eos qui ratione voluptatem sequi nesciunt....
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="col-sm-4">
-                <div className="single-blog">
-                  <div className="single-blog-img">
-                    <img src="assets/images/blog/b3.jpg" alt="blog image" />
-                    <div className="single-blog-img-overlay"></div>
-                  </div>
-                  <div className="single-blog-txt">
-                    <h2>
-                      <a href="#">Why Brands are Looking at Local Language</a>
-                    </h2>
-                    <h3>
-                      By <a href="#">Robert Norby</a> / 18th March 2018
-                    </h3>
-                    <p>
-                      Nemo enim ipsam voluptatem quia voluptas sit aspernatur
-                      aut odit aut fugit, sed quia consequuntur magni dolores
-                      eos qui ratione voluptatem sequi nesciunt....
-                    </p>
-                  </div>
-                </div>
-              </div>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -795,7 +280,7 @@ const Home = () => {
 
       <section id="clients" className="clients">
         <div className="container">
-          <div className="owl-carousel owl-theme" id="client">
+          <div className="owl-carousel owl-theme" id="client" style={{display: 'block'}}>
             <div className="item">
               <a href="#">
                 <img src="assets/images/clients/c1.png" alt="brand-image" />
