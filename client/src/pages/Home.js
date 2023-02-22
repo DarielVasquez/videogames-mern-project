@@ -1,16 +1,24 @@
-import React, {useEffect} from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../actions'
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { fetchProducts } from "../actions";
 import FeaturedMainPage from "../components/FeaturedMainPage";
+import Loading from "../components/Loading";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const allPopularProducts = useSelector(state => state.fetchProducts.popularProducts);
-  const allLatestProducts = useSelector(state => state.fetchProducts.latestProducts);
-  const allFeaturedProducts = useSelector(state => state.fetchProducts.featuredProducts);
-  const isLoading = useSelector(state => state.fetchProducts.isLoading);
-  const error = useSelector(state => state.fetchProducts.error);
-  
+  const allPopularProducts = useSelector(
+    (state) => state.fetchProducts.popularProducts
+  );
+  const allLatestProducts = useSelector(
+    (state) => state.fetchProducts.latestProducts
+  );
+  const allFeaturedProducts = useSelector(
+    (state) => state.fetchProducts.featuredProducts
+  );
+  const isLoading = useSelector((state) => state.fetchProducts.isLoading);
+  const error = useSelector((state) => state.fetchProducts.error);
+
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
@@ -25,79 +33,100 @@ const Home = () => {
   console.log(featuredProducts);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   } else
-  return (
-    <main>
-      <header id="home" className="welcome-hero"  style={{background:'white'}}>
-        <div
-          id="header-carousel"
-          className="carousel slide carousel-fade"
-          data-ride="carousel"
+    return (
+      <main>
+        <header
+          id="home"
+          className="welcome-hero"
+          style={{ background: "white" }}
         >
-          <ol className="carousel-indicators">
-            {popularProducts?.slice(0,3).map((item, index)=>{
-              const {id} = item;
-              return (            
-              <li key={id} 
-              data-target="#header-carousel" 
-              data-slide-to={index}
-              className={index === 0 ? 'active' : ''}>
-                <span className="small-circle"></span>
-              </li>)
-            })}
-          </ol>
+          <div
+            id="header-carousel"
+            className="carousel slide carousel-fade"
+            data-ride="carousel"
+          >
+            <ol className="carousel-indicators">
+              {popularProducts?.slice(0, 4).map((item, index) => {
+                const { id } = item;
+                return (
+                  <li
+                    key={id}
+                    data-target="#header-carousel"
+                    data-slide-to={index}
+                    className={index === 0 ? "active" : ""}
+                  >
+                    <span className="small-circle"></span>
+                  </li>
+                );
+              })}
+            </ol>
 
-          {/* home page */}
-          <div className="carousel-inner" role="listbox">
-            {latestProducts?.slice(0,3).map((product, index) => {
-              const {id, name, background_image, price, description, platforms} = product;
-              return (
-                <div key={id} className={`item ${index === 0 && 'active'}`}>
-                  <div className={`single-slide-item slide${index}`}>
-                    <div className="container">
-                      <div className="welcome-hero-content">
-                        <div className="row">
-                          <div className="col-sm-7">
-                            <div className="single-welcome-hero">
-                              <div className="welcome-hero-txt">
-                                <h4>latest releases</h4>
-                                <h2>{name.length > 50 ? `${name.substring(0,50).trim()}...` : name}</h2>
-                                <div>
-                                  Available on these platforms:
-                                  <ul>
-                                  {platforms.map(({platform})=>{
-                                    const {id, name} = platform;
-                                    return (
-                                      <li key={id}>- {name} </li>
-                                    )
-                                  })}
-                                  </ul>
+            {/* home page */}
+            <div className="carousel-inner" role="listbox">
+              {latestProducts?.slice(0, 4).map((product, index) => {
+                const {
+                  id,
+                  name,
+                  background_image,
+                  price,
+                  description,
+                  platforms,
+                } = product;
+                return (
+                  <div key={id} className={`item ${index === 0 && "active"}`}>
+                    <div className={`single-slide-item slide${index}`}>
+                      <div className="container">
+                        <div className="welcome-hero-content">
+                          <div className="row">
+                            <div className="col-sm-7">
+                              <div className="single-welcome-hero">
+                                <div className="welcome-hero-txt">
+                                  <h4>latest releases</h4>
+                                  <h2>
+                                    {name.length > 50
+                                      ? `${name.substring(0, 50).trim()}...`
+                                      : name}
+                                  </h2>
+                                  <div>
+                                    Available on these platforms:
+                                    <ul>
+                                      {platforms.map(({ platform }) => {
+                                        const { id, name } = platform;
+                                        return <li key={id}>- {name} </li>;
+                                      })}
+                                    </ul>
+                                  </div>
+                                  <button
+                                    className="btn-cart welcome-add-cart"
+                                    // onClick="window.location.href='#'"
+                                  >
+                                    <span className="lnr lnr-plus-circle"></span>
+                                    add <span>to</span> wishlist
+                                  </button>
+                                  <Link
+                                    className="btn-cart welcome-add-cart welcome-more-info"
+                                    to={`product/${id}`}
+                                    style={{ textAlign: "center" }}
+                                  >
+                                    More info
+                                  </Link>
                                 </div>
-                                <button
-                                  className="btn-cart welcome-add-cart"
-                                  // onClick="window.location.href='#'"
-                                >
-                                  <span className="lnr lnr-plus-circle"></span>
-                                  add <span>to</span> cart
-                                </button>
-                                <button
-                                  className="btn-cart welcome-add-cart welcome-more-info"
-                                  // onClick="window.location.href='#'"
-                                >
-                                  more info
-                                </button>
                               </div>
                             </div>
-                          </div>
-                          <div className="col-sm-5">
-                            <div className="single-welcome-hero">
-                              <div className="welcome-hero-img">
-                                <img
-                                  src={background_image}
-                                  alt={name}
-                                  style={{objectFit:'cover', height:'300px'}}
-                                />
+                            <div className="col-sm-5">
+                              <div className="single-welcome-hero">
+                                <div className="welcome-hero-img">
+                                  <img
+                                    src={background_image}
+                                    alt={name}
+                                    style={{
+                                      objectFit: "cover",
+                                      height: "300px",
+                                    }}
+                                  />
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -105,44 +134,79 @@ const Home = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* popular products */}
-      <section id="populer-products" className="populer-products" style={{background:'#f8f9fc', padding:'50px 0'}}>
-        <div className="container">
-          <div className="populer-products-content">
-            <div className="row">
-              {latestProducts?.slice(3,7).map((product)=>{
-                const {id, name, background_image, price, description} = product;
-                return (
-                  <div key={id} className="col-md-3">
-                    <div className="single-populer-products" style={{background:'white', padding: '10px 10px 15px 10px'}}>
-                      <div className="single-populer-product-img mt20" style={{height:'200px', position:'relative'}}>
-                        <img
-                          src={background_image}
-                          alt={name}
-                          style={{height: '200px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', objectFit: 'cover'}}
-                        />
-                      </div>
-                      <h2>
-                        <a href="#" style={{whiteSpace: 'nowrap', overflow: 'hidden', display: 'block',textOverflow: 'ellipsis'}}>{name}</a>
-                      </h2>
-                      <div className="single-populer-products-para">
-                        <p>
-                          Lorem ipsum dolor, sit amet consectetur adipisicing elit. In velit possimus nesciunt suscipit nostrum vitae eveniet architecto atque vero perspiciatis, tenetur beatae nulla quas praesentium, minima debitis facere et hic.
-                          {/* {description.length > 50 ? `${description.substring(0,50).trim()}...` : description} */}
-                        </p>
+        {/* popular products */}
+        <section
+          id="populer-products"
+          className="populer-products"
+          style={{ background: "#f8f9fc", padding: "50px 0" }}
+        >
+          <div className="container">
+            <div className="populer-products-content">
+              <div className="row">
+                {latestProducts?.slice(4, 8).map((product) => {
+                  const { id, name, background_image, price, description } =
+                    product;
+                  return (
+                    <div key={id} className="col-md-3">
+                      <div
+                        className="single-populer-products"
+                        style={{
+                          background: "white",
+                          padding: "10px 10px 15px 10px",
+                        }}
+                      >
+                        <div
+                          className="single-populer-product-img mt20"
+                          style={{ height: "200px", position: "relative" }}
+                        >
+                          <img
+                            src={background_image}
+                            alt={name}
+                            style={{
+                              height: "200px",
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </div>
+                        <h2>
+                          <Link
+                            to={`product/${id}`}
+                            style={{
+                              textAlign: "center",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              display: "block",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {name}
+                          </Link>
+                        </h2>
+                        <div className="single-populer-products-para">
+                          <p>
+                            Lorem ipsum dolor, sit amet consectetur adipisicing
+                            elit. In velit possimus nesciunt suscipit nostrum
+                            vitae eveniet architecto atque vero perspiciatis,
+                            tenetur beatae nulla quas praesentium, minima
+                            debitis facere et hic.
+                            {/* {description.length > 50 ? `${description.substring(0,50).trim()}...` : description} */}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )
-              })}
-              {/* <div className="col-md-6">
+                  );
+                })}
+                {/* <div className="col-md-6">
                 <div className="single-populer-products">
                   <div className="single-inner-populer-products">
                     <div className="row">
@@ -183,102 +247,137 @@ const Home = () => {
                   </div>
                 </div>
               </div> */}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* highest rated */}
-      <section id="new-arrivals" className="new-arrivals">
-        <div className="container">
-          <div className="section-header">
-            <h2>highest rated</h2>
+        {/* highest rated */}
+        <section id="new-arrivals" className="new-arrivals">
+          <div className="container">
+            <div className="section-header">
+              <h2>highest rated</h2>
+            </div>
+            <div className="new-arrivals-content">
+              <div className="row">
+                {popularProducts?.slice(0, 8).map((product) => {
+                  const { id, name, background_image } = product;
+                  return (
+                    <div key={id} className="col-md-3 col-sm-4">
+                      <div className="single-new-arrival">
+                        <div
+                          className="single-new-arrival-bg"
+                          style={{ background: "white" }}
+                        >
+                          <img
+                            src={background_image}
+                            alt={name}
+                            style={{ height: "250px", objectFit: "cover" }}
+                          />
+                          <div className="single-new-arrival-bg-overlay"></div>
+                          <div className="new-arrival-cart">
+                            <p>
+                              <span className="lnr lnr-cart"></span>
+                              <a href="#">
+                                add <span>to </span> cart
+                              </a>
+                            </p>
+                            <p className="arrival-review pull-right">
+                              <span className="lnr lnr-heart"></span>
+                              <span className="lnr lnr-frame-expand"></span>
+                            </p>
+                          </div>
+                        </div>
+                        <h4>
+                          <Link
+                            to={`product/${id}`}
+                            style={{
+                              textAlign: "center",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              display: "block",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {name.length > 50
+                              ? `${name.substring(0, 50).trim()}...`
+                              : name}
+                          </Link>
+                        </h4>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          <div className="new-arrivals-content">
-            <div className="row">
-              {popularProducts?.slice(0,8).map((product)=>{
-                const {id, name, background_image} = product;
-                return (
-                  <div key={id} className="col-md-3 col-sm-4">
-                    <div className="single-new-arrival">
-                      <div className="single-new-arrival-bg" style={{background:'white'}}>
+        </section>
+
+        {/* featured product main page */}
+        <FeaturedMainPage id={featuredSingleProductId} />
+
+        {/* featured products */}
+        <section
+          id="feature"
+          className="feature"
+          style={{ background: "#f8f9fc" }}
+        >
+          <div className="container">
+            <div className="section-header">
+              <h2>featured products</h2>
+            </div>
+            <div className="feature-content">
+              <div className="row">
+                {featuredProducts?.slice(0, 4).map((product) => {
+                  const { id, name, background_image, ratings_count } = product;
+                  return (
+                    <div key={id} className="col-sm-3">
+                      <div className="single-feature">
                         <img
                           src={background_image}
                           alt={name}
-                          style={{height:'250px',objectFit:'cover'}}
+                          style={{ height: "250px", objectFit: "cover" }}
                         />
-                        <div className="single-new-arrival-bg-overlay"></div>
-                        <div className="new-arrival-cart">
+                        <div className="single-feature-txt text-center">
                           <p>
-                            <span className="lnr lnr-cart"></span>
-                            <a href="#">
-                              add <span>to </span> cart
-                            </a>
+                            <i className="fa fa-star"></i>
+                            <i className="fa fa-star"></i>
+                            <i className="fa fa-star"></i>
+                            <i className="fa fa-star"></i>
+                            <span className="spacial-feature-icon">
+                              <i className="fa fa-star"></i>
+                            </span>
+                            <span className="feature-review">
+                              ({ratings_count})
+                            </span>
                           </p>
-                          <p className="arrival-review pull-right">
-                            <span className="lnr lnr-heart"></span>
-                            <span className="lnr lnr-frame-expand"></span>
-                          </p>
+                          <h3>
+                            <Link
+                              to={`product/${id}`}
+                              style={{
+                                textAlign: "center",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                display: "block",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {name.length > 50
+                                ? `${name.substring(0, 50).trim()}...`
+                                : name}
+                            </Link>
+                          </h3>
                         </div>
                       </div>
-                      <h4>
-                        <a href="#">{name.length > 50 ? `${name.substring(0,50).trim()}...` : name}</a>
-                      </h4>
                     </div>
-                  </div>
-                )
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* featured product main page */}
-      <FeaturedMainPage id={featuredSingleProductId}/>
-
-      {/* featured products */}
-      <section id="feature" className="feature">
-        <div className="container">
-          <div className="section-header">
-            <h2>featured products</h2>
-          </div>
-          <div className="feature-content">
-            <div className="row">
-              {featuredProducts?.slice(0,4).map((product)=>{
-                const {id, name, background_image, ratings_count} = product;
-                return (
-                  <div key={id} className="col-sm-3">
-                    <div className="single-feature">
-                      <img
-                        src={background_image}
-                        alt={name}
-                        style={{height:'250px', objectFit:'cover'}}
-                      />
-                      <div className="single-feature-txt text-center">
-                        <p>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <span className="spacial-feature-icon">
-                            <i className="fa fa-star"></i>
-                          </span>
-                          <span className="feature-review">({ratings_count})</span>
-                        </p>
-                        <h3>
-                          <a href="#">{name.length > 50 ? `${name.substring(0,50).trim()}...` : name}</a>
-                        </h3>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="clients" className="clients">
+        {/* <section id="clients" className="clients">
         <div className="container">
           <div className="owl-carousel owl-theme" id="client" style={{display: 'block'}}>
             <div className="item">
@@ -308,159 +407,93 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <section id="newsletter" className="newsletter">
-        <div className="container">
-          <div className="hm-footer-details">
-            <div className="row">
-              <div className=" col-md-3 col-sm-6 col-xs-12">
-                <div className="hm-footer-widget">
-                  <div className="hm-foot-title">
-                    <h4>information</h4>
-                  </div>
-                  <div className="hm-foot-menu">
-                    <ul>
-                      <li>
-                        <a href="#">about us</a>
-                      </li>
-                      <li>
-                        <a href="#">contact us</a>
-                      </li>
-                      <li>
-                        <a href="#">news</a>
-                      </li>
-                      <li>
-                        <a href="#">store</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className=" col-md-3 col-sm-6 col-xs-12">
-                <div className="hm-footer-widget">
-                  <div className="hm-foot-title">
-                    <h4>collections</h4>
-                  </div>
-                  <div className="hm-foot-menu">
-                    <ul>
-                      <li>
-                        <a href="#">wooden chair</a>
-                      </li>
-                      <li>
-                        <a href="#">royal cloth sofa</a>
-                      </li>
-                      <li>
-                        <a href="#">accent chair</a>
-                      </li>
-                      <li>
-                        <a href="#">bed</a>
-                      </li>
-                      <li>
-                        <a href="#">hanging lamp</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className=" col-md-3 col-sm-6 col-xs-12">
-                <div className="hm-footer-widget">
-                  <div className="hm-foot-title">
-                    <h4>my accounts</h4>
-                  </div>
-                  <div className="hm-foot-menu">
-                    <ul>
-                      <li>
-                        <a href="#">my account</a>
-                      </li>
-                      <li>
-                        <a href="#">wishlist</a>
-                      </li>
-                      <li>
-                        <a href="#">Community</a>
-                      </li>
-                      <li>
-                        <a href="#">order history</a>
-                      </li>
-                      <li>
-                        <a href="#">my cart</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div className=" col-md-3 col-sm-6  col-xs-12">
-                <div className="hm-footer-widget">
-                  <div className="hm-foot-title">
-                    <h4>newsletter</h4>
-                  </div>
-                  <div className="hm-foot-para">
-                    <p>Subscribe to get latest news,update and information.</p>
-                  </div>
-                  <div className="hm-foot-email">
-                    <div className="foot-email-box">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Email Here...."
-                      />
+        <section id="newsletter" className="newsletter">
+          <div className="container">
+            <div className="hm-footer-details">
+              <div className="row">
+                <div className=" col-md-4 col-sm-4 col-xs-6">
+                  <div className="hm-footer-widget">
+                    <div className="hm-foot-title">
+                      <h4>information</h4>
                     </div>
-                    <div className="foot-email-subscribe">
-                      <span>
-                        <i className="fa fa-location-arrow"></i>
-                      </span>
+                    <div className="hm-foot-menu">
+                      <ul>
+                        <li>
+                          <a href="#">about us</a>
+                        </li>
+                        <li>
+                          <a href="#">contact us</a>
+                        </li>
+                        <li>
+                          <a href="#">news</a>
+                        </li>
+                        <li>
+                          <a href="#">store</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div className=" col-md-4 col-sm-4 col-xs-6">
+                  <div className="hm-footer-widget">
+                    <div className="hm-foot-title">
+                      <h4>collections</h4>
+                    </div>
+                    <div className="hm-foot-menu">
+                      <ul>
+                        <li>
+                          <a href="#">wooden chair</a>
+                        </li>
+                        <li>
+                          <a href="#">royal cloth sofa</a>
+                        </li>
+                        <li>
+                          <a href="#">accent chair</a>
+                        </li>
+                        <li>
+                          <a href="#">bed</a>
+                        </li>
+                        <li>
+                          <a href="#">hanging lamp</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div className=" col-md-4 col-sm-4 col-xs-6">
+                  <div className="hm-footer-widget">
+                    <div className="hm-foot-title">
+                      <h4>my accounts</h4>
+                    </div>
+                    <div className="hm-foot-menu">
+                      <ul>
+                        <li>
+                          <a href="#">my account</a>
+                        </li>
+                        <li>
+                          <a href="#">wishlist</a>
+                        </li>
+                        <li>
+                          <a href="#">Community</a>
+                        </li>
+                        <li>
+                          <a href="#">order history</a>
+                        </li>
+                        <li>
+                          <a href="#">my cart</a>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <footer id="footer" className="footer">
-        <div className="container">
-          <div className="hm-footer-copyright text-center">
-            <div className="footer-social">
-              <a href="#">
-                <i className="fa fa-facebook"></i>
-              </a>
-              <a href="#">
-                <i className="fa fa-instagram"></i>
-              </a>
-              <a href="#">
-                <i className="fa fa-linkedin"></i>
-              </a>
-              <a href="#">
-                <i className="fa fa-pinterest"></i>
-              </a>
-              <a href="#">
-                <i className="fa fa-behance"></i>
-              </a>
-            </div>
-            <p>
-              &copy;copyright. designed and developed by{" "}
-              <a href="https://www.themesine.com/">themesine</a>
-            </p>
-          </div>
-        </div>
-
-        <div id="scroll-Top">
-          <div className="return-to-top">
-            <i
-              className="fa fa-angle-up "
-              id="scroll-top"
-              data-toggle="tooltip"
-              data-placement="top"
-              title=""
-              data-original-title="Back to Top"
-              aria-hidden="true"
-            ></i>
-          </div>
-        </div>
-      </footer>
-    </main>
-  );
+        </section>
+      </main>
+    );
 };
 
 export default Home;
