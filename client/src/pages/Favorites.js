@@ -17,7 +17,6 @@ const Favorites = () => {
 
   const handleRemoveFavorite = () => {};
 
-  console.log(favorites);
   return (
     <main className="container">
       <div className="row justify-content-md-center">
