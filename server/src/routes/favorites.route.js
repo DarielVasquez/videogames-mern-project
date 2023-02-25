@@ -4,8 +4,9 @@ import FavoritesController from "../controllers/favorites.controller.js";
 const router = express.Router();
 
 router
-  .route("/")
-  .get(FavoritesController.getFavoritesController)
-  .post(FavoritesController.postFavoriteController);
+  .route("/:id")
+  .get(FavoritesController.apiGetFavorites)
+  .post(FavoritesController.apiAddFavorite)
+  .delete(FavoritesController.apiRemoveFavorite);
 
 export default router;

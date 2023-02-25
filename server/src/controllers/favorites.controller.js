@@ -1,11 +1,11 @@
 import FavoritesModel from "../models/favorites.model.js";
 
 export default class FavoritesController {
-  static async getFavoritesController(req, res, next) {
-    const userId = req.body.id;
+  static async apiGetFavorites(req, res, next) {
+    const userId = req.params.id;
     try {
       const { favoritesList, totalNumFavorites } =
-        await FavoritesModel.getFavorites({ userId });
+        await FavoritesModel.getFavoritesById({ userId });
       res.json({
         favorites: favoritesList,
         totalNumFavorites,
@@ -16,22 +16,56 @@ export default class FavoritesController {
     }
   }
 
-  static async postFavoriteController(req, res, next) {
+  static async apiAddFavorite(req, res, next) {
     try {
       const userId = req.params.id;
-      const gameId = req.body.id;
+      const gameId = req.body.gameId;
+      const gameName = req.body.gameName;
+      const gameImg = req.body.gameImg;
+      const gameDesc = req.body.gameDesc;
+      const dateAdded = new Date();
       if (!gameId) {
         res.status(400).json({ error: "Game ID required" });
         return;
       }
-      const userGameResponse = await FavoritesModel.postFavorite(
+      const { status, message } = await FavoritesModel.addFavorite({
         userId,
-        gameId
-      );
-      const { userGame } = userGameResponse;
-      res.json({ status: "success", userGame });
+        gameId,
+        gameName,
+        gameImg,
+        gameDesc,
+        dateAdded,
+      });
+      let response = {
+        status: status,
+        message: message,
+      };
+      res.json(response);
     } catch (e) {
       console.error(`Unable to add user game, ${e}`);
+      res.status(500).json({ error: e });
+    }
+  }
+
+  static async apiRemoveFavorite(req, res, next) {
+    try {
+      const userId = req.params.id;
+      const gameId = req.body.gameId;
+      if (!gameId) {
+        res.status(400).json({ error: "Game ID required" });
+        return;
+      }
+      const { status, message } = await FavoritesModel.removeFavorite({
+        userId,
+        gameId,
+      });
+      let response = {
+        status: status,
+        message: message,
+      };
+      res.json(response);
+    } catch (e) {
+      console.error(`Unable to remove user game, ${e}`);
       res.status(500).json({ error: e });
     }
   }
