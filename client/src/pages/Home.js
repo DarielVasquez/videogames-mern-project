@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchProducts } from "../actions";
 import FeaturedMainPage from "../components/FeaturedMainPage";
 import Loading from "../components/Loading";
+import { addFavorite } from "../services/favorites";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -31,6 +32,16 @@ const Home = () => {
   console.log(popularProducts);
   console.log(latestProducts);
   console.log(featuredProducts);
+
+  const handleAddFavorite = async ({ id, name, background_image } = {}) => {
+    const data = {
+      gameId: id,
+      gameName: name,
+      gameImg: background_image,
+      gameDesc: "",
+    };
+    const request = await addFavorite("63f8fd2167a765f94ff2029f", data);
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -100,7 +111,14 @@ const Home = () => {
                                   </div>
                                   <button
                                     className="btn-cart welcome-add-cart"
-                                    // onClick="window.location.href='#'"
+                                    style={{ textAlign: "center" }}
+                                    onClick={() =>
+                                      handleAddFavorite({
+                                        id,
+                                        name,
+                                        background_image,
+                                      })
+                                    }
                                   >
                                     <span className="lnr lnr-plus-circle"></span>
                                     add <span>to</span> wishlist

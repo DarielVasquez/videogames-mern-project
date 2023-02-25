@@ -34,6 +34,15 @@ a {
   cursor: pointer;
 }
 
+.table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.table > tbody > tr > th {
+  vertical-align: middle;
+  text-align: center;
+}
+
 /* Loading */
 
 .loading {
