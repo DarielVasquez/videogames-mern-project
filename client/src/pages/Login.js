@@ -1,21 +1,23 @@
 import React from "react";
 import { useState } from "react";
+import { loginUser } from "../services/login";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // submit login form
+    const loginData = await loginUser({ email, password });
+    console.log(loginData);
   };
   return (
     <main>
@@ -39,17 +41,17 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "20px" }}>
               <label
-                htmlFor="username"
+                htmlFor="email"
                 style={{ display: "block", marginBottom: "5px" }}
               >
-                Username:
+                Email:
               </label>
               <input
                 type="text"
-                id="username"
-                name="username"
-                value={username}
-                onChange={handleUsernameChange}
+                id="email"
+                name="email"
+                value={email}
+                onChange={handleEmailChange}
                 style={{
                   width: "100%",
                   padding: "10px",

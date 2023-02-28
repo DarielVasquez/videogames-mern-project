@@ -40,7 +40,7 @@ const Home = () => {
       gameImg: background_image,
       gameDesc: "",
     };
-    const request = await addFavorite("63f8fd2167a765f94ff2029f", data);
+    const request = await addFavorite(data);
   };
 
   if (isLoading) {

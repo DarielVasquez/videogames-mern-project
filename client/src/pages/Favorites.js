@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { deleteFavorite, getFavoritesByUserId } from "../services/favorites";
+import { deleteFavorite, getFavorites } from "../services/favorites";
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
-  const { id } = useParams();
 
-  useEffect(() => {
+  const handleRemoveFavorite = async (game_id) => {
+    const removeFavorite = await deleteFavorite(game_id);
     fetchFavorites();
-  }, [id]);
+  };
 
   const fetchFavorites = async () => {
-    const favoritesData = await getFavoritesByUserId(id);
+    const favoritesData = await getFavorites();
     setFavorites(favoritesData.favorites);
   };
 
-  const handleRemoveFavorite = () => {};
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
 
   return (
     <main className="container">
