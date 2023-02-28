@@ -1,28 +1,37 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/favorites";
+const API_URL = `${process.env.REACT_APP_API_URL}favorites`;
 
-export const getFavoritesByUserId = async (id) => {
+export const getFavorites = async () => {
   try {
-    const response = await axios.get(`${API_URL}/${id}`);
+    const response = await axios.get(API_URL, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const addFavorite = async (id, newFavorite) => {
+export const addFavorite = async (newFavorite) => {
   try {
-    const response = await axios.post(`${API_URL}/${id}`, newFavorite);
+    const response = await axios.post(API_URL, newFavorite, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error(error);
   }
 };
 
-export const deleteFavorite = async (id) => {
+export const deleteFavorite = async (gameId) => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}`);
+    const response = await axios.delete(API_URL, {
+      data: {
+        gameId,
+      },
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error(error);
