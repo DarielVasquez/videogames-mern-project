@@ -3,6 +3,7 @@ import mongodb from "mongodb";
 import dotenv from "dotenv";
 import UsersModel from "./models/users.model.js";
 import FavoritesModel from "./models/favorites.model.js";
+import LoginModel from "./models/login.model.js";
 dotenv.config();
 const MongoClient = mongodb.MongoClient;
 
@@ -20,6 +21,7 @@ MongoClient.connect(process.env.ATLAS_DB_URI, {
   .then(async (client) => {
     await UsersModel.injectDB(client);
     await FavoritesModel.injectDB(client);
+    await LoginModel.injectDB(client);
     app.listen(port, () => {
       console.log(`listening on port ${port}`);
     });

@@ -1,9 +1,10 @@
+import bcrypt from "bcrypt";
 import UsersModel from "../models/users.model.js";
 
 export default class UsersController {
   static async apiGetUser(req, res, next) {
     try {
-      const userId = req.params.id;
+      const userId = req.cookies.userId;
       const { user, status, message } = await UsersModel.getUser({
         userId,
       });
@@ -21,15 +22,14 @@ export default class UsersController {
 
   static async apiAddUser(req, res, next) {
     try {
-      const name = req.body.name;
-      const username = req.body.username;
-      const password = req.body.password;
-      const email = req.body.email;
+      const { name, username, password, email } = req.body;
       const date = new Date();
+      //password encryption
+      const hashedPassword = await bcrypt.hash(password, 10);
       const { status, message } = await UsersModel.addUser({
         name,
         username,
-        password,
+        password: hashedPassword,
         email,
         date,
       });
@@ -46,16 +46,15 @@ export default class UsersController {
 
   static async apiUpdateUser(req, res, next) {
     try {
-      const userId = req.params.id;
-      const name = req.body.name;
-      const username = req.body.username;
-      const password = req.body.password;
-      const email = req.body.email;
+      const userId = req.cookies.userId;
+      const { name, username, password, email } = req.body;
+      //password encryption
+      const hashedPassword = await bcrypt.hash(password, 10);
       const { status, message } = await UsersModel.updateUser({
         userId,
         name,
         username,
-        password,
+        password: hashedPassword,
         email,
       });
       let response = {
@@ -71,7 +70,7 @@ export default class UsersController {
 
   static async apiRemoveUser(req, res, next) {
     try {
-      const userId = req.params.id;
+      const userId = req.cookies.userId;
       const { status, message } = await UsersModel.removeUser({
         userId,
       });

@@ -72,13 +72,19 @@ export default class UsersModel {
       }
 
       // Check if username is already used
-      const existingUserByUsername = await users.findOne({ username });
+      const existingUserByUsername = await users.findOne({
+        username,
+        _id: { $ne: ObjectId(userId) },
+      });
       if (existingUserByUsername) {
         return { status: "failure", message: "Username is already in use" };
       }
 
       // Check if email is already used
-      const existingUserByEmail = await users.findOne({ email });
+      const existingUserByEmail = await users.findOne({
+        email,
+        _id: { $ne: ObjectId(userId) },
+      });
       if (existingUserByEmail) {
         return { status: "failure", message: "Email is already in use" };
       }
@@ -89,8 +95,8 @@ export default class UsersModel {
           $set: {
             name: name,
             username: username,
-            email: email,
             password: password,
+            email: email,
           },
         }
       );

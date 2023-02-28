@@ -1,12 +1,13 @@
 import express from "express";
 import FavoritesController from "../controllers/favorites.controller.js";
+import verifyToken from "../middleware/token.js";
 
 const router = express.Router();
 
 router
-  .route("/:id")
-  .get(FavoritesController.apiGetFavorites)
-  .post(FavoritesController.apiAddFavorite)
+  .route("/")
+  .get(verifyToken, FavoritesController.apiGetFavorites)
+  .post(verifyToken, FavoritesController.apiAddFavorite)
   .delete(FavoritesController.apiRemoveFavorite);
 
 export default router;
