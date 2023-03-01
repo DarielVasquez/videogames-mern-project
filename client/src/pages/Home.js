@@ -5,9 +5,12 @@ import { fetchProducts } from "../actions";
 import FeaturedMainPage from "../components/FeaturedMainPage";
 import Loading from "../components/Loading";
 import { addFavorite } from "../services/favorites";
+import { fetchSingleProduct } from "../actions";
 
 const Home = () => {
   const dispatch = useDispatch();
+
+  //all products
   const allPopularProducts = useSelector(
     (state) => state.fetchProducts.popularProducts
   );
@@ -22,26 +25,43 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(fetchProducts());
-  }, [dispatch]);
+  }, [fetchProducts]);
 
   const popularProducts = allPopularProducts.results;
   const latestProducts = allLatestProducts.results;
   const featuredProducts = allFeaturedProducts.results;
   const featuredSingleProductId = allLatestProducts.results?.[0].id;
 
-  console.log(popularProducts);
-  console.log(latestProducts);
-  console.log(featuredProducts);
+  // console.log(popularProducts);
+  // console.log(latestProducts);
+  // console.log(featuredProducts);
 
-  const handleAddFavorite = async ({ id, name, background_image } = {}) => {
-    const data = {
-      gameId: id,
-      gameName: name,
-      gameImg: background_image,
-      gameDesc: "",
-    };
-    const request = await addFavorite(data);
+  //add to favorites
+  const singleProduct = useSelector(
+    (state) => state.fetchSingleProduct.singleProduct
+  );
+  const [clicked, setClicked] = useState(false);
+
+  const handleAddFavorite = async ({ id }) => {
+    setClicked(true);
+    dispatch(fetchSingleProduct(id));
   };
+
+  useEffect(() => {
+    if (clicked && singleProduct) {
+      const dataGame = {
+        gameId: singleProduct.id,
+        gameName: singleProduct.name,
+        gameImg: singleProduct.background_image,
+        gameDesc: singleProduct.description_raw,
+      };
+      console.log(dataGame);
+      const addFavoriteData = async () => {
+        const request = await addFavorite(dataGame);
+      };
+      addFavoriteData();
+    }
+  }, [singleProduct]);
 
   if (isLoading) {
     return <Loading />;
@@ -115,13 +135,11 @@ const Home = () => {
                                     onClick={() =>
                                       handleAddFavorite({
                                         id,
-                                        name,
-                                        background_image,
                                       })
                                     }
                                   >
                                     <span className="lnr lnr-plus-circle"></span>
-                                    add <span>to</span> wishlist
+                                    add <span>to</span> favorites
                                   </button>
                                   <Link
                                     className="btn-cart welcome-add-cart welcome-more-info"
@@ -294,14 +312,26 @@ const Home = () => {
                           />
                           <div className="single-new-arrival-bg-overlay"></div>
                           <div className="new-arrival-cart">
-                            <p>
-                              <span className="lnr lnr-cart"></span>
-                              <a href="#">
-                                add <span>to </span> cart
-                              </a>
+                            <p
+                              style={{
+                                cursor: "pointer",
+                              }}
+                              onClick={() =>
+                                handleAddFavorite({
+                                  id,
+                                })
+                              }
+                            >
+                              <span
+                                className="lnr lnr-heart"
+                                style={{
+                                  paddingRight: "5px",
+                                  cursor: "pointer",
+                                }}
+                              ></span>
+                              add <span>to </span> favorites
                             </p>
                             <p className="arrival-review pull-right">
-                              <span className="lnr lnr-heart"></span>
                               <span className="lnr lnr-frame-expand"></span>
                             </p>
                           </div>
@@ -491,7 +521,7 @@ const Home = () => {
                           <a href="#">my account</a>
                         </li>
                         <li>
-                          <a href="#">wishlist</a>
+                          <a href="#">favorites</a>
                         </li>
                         <li>
                           <a href="#">Community</a>

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleProduct } from "../actions";
 import NoProduct from "./NoProduct";
 import Loading from "../components/Loading";
+import { addFavorite } from "../services/favorites";
 
 const SingleProduct = () => {
   const { id } = useParams();
@@ -18,6 +19,16 @@ const SingleProduct = () => {
   useEffect(() => {
     if (id) dispatch(fetchSingleProduct(id));
   }, [dispatch, id]);
+
+  const handleAddFavorite = async ({ id, name, image, description } = {}) => {
+    const data = {
+      gameId: parseInt(id),
+      gameName: name,
+      gameImg: image,
+      gameDesc: description,
+    };
+    const request = await addFavorite(data);
+  };
 
   const {
     name,
@@ -138,6 +149,23 @@ const SingleProduct = () => {
             <p>
               <strong>Metacritic rating: </strong> {metacritic}
             </p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <button
+                className="btn-cart welcome-add-cart"
+                style={{ textAlign: "center" }}
+                onClick={() =>
+                  handleAddFavorite({
+                    id,
+                    name,
+                    image,
+                    description,
+                  })
+                }
+              >
+                <span className="lnr lnr-plus-circle"></span>
+                add <span>to</span> favorites
+              </button>
+            </div>
           </div>
         </div>
       </main>
