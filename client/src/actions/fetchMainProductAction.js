@@ -30,7 +30,6 @@ export const fetchMainProductFailure = (error) => {
 export const fetchMainProduct = (id) => {
   return async (dispatch) => {
     dispatch(fetchMainProductStart());
-    console.log("ye");
     try {
       const response = await fetch(url + id + `?key=${key}`);
       const product = await response.json();

@@ -1,8 +1,31 @@
-import React from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchQuery } from "../actions";
+import Loading from "./Loading";
 
 const Navbar = () => {
-  const location = useLocation();
+  const dispatch = useDispatch();
+  const [searchValue, setSearchValue] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const queryProducts = useSelector((state) => state.fetchQuery.queryProducts);
+  const isLoading = useSelector((state) => state.fetchQuery.isLoading);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+  };
+
+  useEffect(() => {
+    if (searchValue) {
+      setShowResults(true);
+      dispatch(fetchQuery(searchValue));
+    }
+
+    if (searchValue === "") {
+      setShowResults(false);
+    }
+  }, [searchValue]);
 
   return (
     <nav className="top-area">
@@ -22,11 +45,71 @@ const Navbar = () => {
                 <input
                   type="text"
                   className="form-control"
+                  name="search"
                   placeholder="Search"
+                  value={searchValue}
+                  autoComplete="off"
+                  onChange={handleChange}
+                  onFocus={() => searchValue.length && setShowResults(true)}
+                  onBlur={() => setTimeout(() => setShowResults(false), 200)}
                 />
                 <span className="input-group-addon close-search">
                   <i className="fa fa-times"></i>
                 </span>
+                {showResults && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "60px",
+                      left: "10%",
+                      right: "10%",
+                      zIndex: 1,
+                      background: "#fff",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      boxShadow: "0 2px 4px rgba(0,0,0,.1)",
+                      maxHeight: "300px",
+                      overflowY: "auto",
+                      padding: "10px",
+                      width: "80%",
+                    }}
+                  >
+                    {isLoading ? (
+                      <div
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <div className="lds-dual-ring-sm"></div>
+                      </div>
+                    ) : queryProducts?.length === 0 ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          padding: "10px",
+                        }}
+                      >
+                        "No results available...
+                      </div>
+                    ) : (
+                      queryProducts?.map((result) => (
+                        <div key={result.id}>
+                          <Link
+                            to={`/product/${result.id}`}
+                            style={{
+                              textAlign: "center",
+                              fontSize: "16px",
+                              color: "#a09e9c",
+                              padding: "5px",
+                            }}
+                            onClick={() => setShowResults(false)}
+                          >
+                            {result.name}
+                          </Link>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -157,24 +240,59 @@ const Navbar = () => {
               className="collapse navbar-collapse menu-ui-design"
               id="navbar-menu"
             >
-              <ul
-                className="nav navbar-nav navbar-center"
+              <div
+                className="nav navbar-center"
                 data-in="fadeInDown"
                 data-out="fadeOutUp"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingTop: "10px",
+                }}
               >
-                <li className="scroll active">
-                  <a href="#home">home</a>
-                </li>
-                <li className="scroll">
-                  <a href="#new-arrivals">highest rated</a>
-                </li>
-                <li className="scroll">
-                  <a href="#feature">featured</a>
-                </li>
-                <li className="scroll">
-                  <a href="#newsletter">contact</a>
-                </li>
-              </ul>
+                <Link
+                  to={"/"}
+                  style={{
+                    display: "inline-block",
+                    padding: "35px",
+                    fontSize: "18px",
+                  }}
+                >
+                  Home
+                </Link>
+                <Link
+                  to={"/"}
+                  style={{
+                    display: "inline-block",
+                    padding: "35px",
+                    fontSize: "18px",
+                  }}
+                >
+                  Games
+                </Link>
+                <NavLink
+                  to={"/favorites"}
+                  style={{
+                    display: "inline-block",
+                    padding: "35px",
+                    fontSize: "18px",
+                  }}
+                >
+                  Favorites
+                </NavLink>
+                <Link
+                  to={"/"}
+                  style={{
+                    display: "inline-block",
+                    padding: "35px",
+                    fontSize: "18px",
+                  }}
+                >
+                  About
+                </Link>
+              </div>
             </div>
           </div>
         </nav>

@@ -21,7 +21,10 @@ const Favorites = () => {
 
   return (
     <main className="container">
-      <div className="row justify-content-md-center">
+      <div
+        className="row justify-content-md-center"
+        style={{ marginTop: "110px" }}
+      >
         <div className="col-sm">
           <table
             className="table table-striped table-bordered table-hover"
@@ -64,8 +67,23 @@ const Favorites = () => {
                         }}
                       />
                     </td>
-                    <td style={{ width: "30%" }}>{game_name}</td>
-                    <td style={{ width: "40%" }}>{game_desc}</td>
+                    <td style={{ width: "30%" }}>
+                      <Link
+                        to={`/product/${game_id}`}
+                        style={{
+                          textAlign: "center",
+                          fontSize: "16px",
+                          color: "#a09e9c",
+                        }}
+                      >
+                        {game_name}
+                      </Link>
+                    </td>
+                    <td style={{ width: "40%", textTransform: "none" }}>
+                      {game_desc?.length > 250
+                        ? `${game_desc?.slice(0, 250)}...`
+                        : game_desc}
+                    </td>
                     <td style={{ width: "10%" }}>
                       <button
                         onClick={() => handleRemoveFavorite(game_id)}
