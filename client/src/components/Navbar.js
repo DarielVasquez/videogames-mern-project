@@ -35,6 +35,7 @@ const Navbar = () => {
           data-minus-value-desktop="70"
           data-minus-value-mobile="55"
           data-speed="1000"
+          style={{ backgroundColor: "white" }}
         >
           <div className="top-search">
             <div className="container">
@@ -222,12 +223,15 @@ const Navbar = () => {
               </ul>
             </div>
 
-            <div className="navbar-header">
+            <div className="navbar-header" style={{ backgroundColor: "white" }}>
               <button
                 type="button"
                 className="navbar-toggle"
                 data-toggle="collapse"
                 data-target="#navbar-menu"
+                aria-controls="navbar-menu"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
               >
                 <i className="fa fa-bars"></i>
               </button>
@@ -236,62 +240,34 @@ const Navbar = () => {
               </Link>
             </div>
 
-            <div
-              className="collapse navbar-collapse menu-ui-design"
-              id="navbar-menu"
-            >
+            <div className="collapse navbar-collapse " id="navbar-menu">
               <div
-                className="nav navbar-center"
+                className="nav navbar-center navbar-menu-container navbar-expand-lg "
                 data-in="fadeInDown"
                 data-out="fadeOutUp"
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingTop: "10px",
-                }}
               >
-                <Link
-                  to={"/"}
-                  style={{
-                    display: "inline-block",
-                    padding: "35px",
-                    fontSize: "18px",
-                  }}
-                >
-                  Home
-                </Link>
-                <Link
-                  to={"/"}
-                  style={{
-                    display: "inline-block",
-                    padding: "35px",
-                    fontSize: "18px",
-                  }}
-                >
-                  Games
-                </Link>
-                <NavLink
-                  to={"/favorites"}
-                  style={{
-                    display: "inline-block",
-                    padding: "35px",
-                    fontSize: "18px",
-                  }}
-                >
-                  Favorites
-                </NavLink>
-                <Link
-                  to={"/"}
-                  style={{
-                    display: "inline-block",
-                    padding: "35px",
-                    fontSize: "18px",
-                  }}
-                >
-                  About
-                </Link>
+                <ul className="navbar-nav">
+                  <li className="nav-item navbar-item">
+                    <Link className="nav-link" to={"/"}>
+                      home
+                    </Link>
+                  </li>
+                  <li className="nav-item navbar-item">
+                    <Link className="nav-link" to={"/"}>
+                      products
+                    </Link>
+                  </li>
+                  <li className="nav-item navbar-item">
+                    <Link className="nav-link" to={"/favorites"}>
+                      favorites
+                    </Link>
+                  </li>
+                  <li className="nav-item navbar-item">
+                    <Link className="nav-link" to={"/"}>
+                      about
+                    </Link>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

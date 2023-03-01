@@ -23,7 +23,7 @@ const Favorites = () => {
     <main className="container">
       <div
         className="row justify-content-md-center"
-        style={{ marginTop: "110px" }}
+        style={{ marginTop: "150px" }}
       >
         <div className="col-sm">
           <table
@@ -44,7 +44,9 @@ const Favorites = () => {
                 <th scope="col">#</th>
                 <th scope="col">Image</th>
                 <th scope="col">Name</th>
-                <th scope="col">Description</th>
+                <th scope="col" className="table-desc">
+                  Description
+                </th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
@@ -79,7 +81,10 @@ const Favorites = () => {
                         {game_name}
                       </Link>
                     </td>
-                    <td style={{ width: "40%", textTransform: "none" }}>
+                    <td
+                      className="table-desc"
+                      style={{ width: "40%", textTransform: "none" }}
+                    >
                       {game_desc?.length > 250
                         ? `${game_desc?.slice(0, 250)}...`
                         : game_desc}

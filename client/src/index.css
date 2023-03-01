@@ -114,3 +114,62 @@ a {
   background-color: transparent;
   border-radius: 6px;
 }
+
+/* table description toggle */
+
+@media screen and (max-width: 768px) {
+  .table-desc {
+    display: none;
+  }
+}
+
+/* burger menu fix */
+
+.navbar-item {
+  padding: 30px;
+  font-size: 18px;
+}
+
+.navbar-menu-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar-menu-container {
+    display: flex;
+    flex-direction: "column";
+    justify-content: space-between;
+  }
+}
+
+nav.navbar.bootsnav .navbar-collapse.collapse.in {
+  padding-bottom: 30px;
+  background-color: white;
+  box-shadow: 0 5px 5px rgb(0 0 0 / 20%);
+}
+
+.navbar-collapse {
+  background-color: #fff !important;
+}
+
+@media screen and (max-width: 992px) {
+  nav.navbar.bootsnav .navbar-collapse.collapse.in {
+    padding-bottom: 30px;
+    background-color: white;
+    box-shadow: 0 5px 5px rgb(0 0 0 / 20%);
+  }
+  .navbar-menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 10px;
+  }
+  .navbar-item {
+    padding: 0px;
+  }
+}
