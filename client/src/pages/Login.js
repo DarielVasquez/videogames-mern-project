@@ -1,8 +1,14 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import Cookies from "universal-cookie";
 import { loginUser } from "../services/login";
+import { loginUserAction } from "../actions";
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const cookies = new Cookies();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,8 +23,18 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const loginData = await loginUser({ email, password });
-    console.log(loginData);
+    if (loginData.status === "success") {
+      dispatch(loginUserAction());
+      navigate("/");
+    }
   };
+
+  useEffect(() => {
+    if (cookies.get("jwtToken")) {
+      navigate("/");
+    }
+  }, []);
+
   return (
     <main>
       <div
