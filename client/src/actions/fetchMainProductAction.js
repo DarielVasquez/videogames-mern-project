@@ -33,7 +33,6 @@ export const fetchMainProduct = (id) => {
     try {
       const response = await fetch(url + id + `?key=${key}`);
       const product = await response.json();
-      console.log(product);
       dispatch(fetchMainProductSuccess(product));
     } catch (error) {
       dispatch(fetchMainProductFailure(error.message));
