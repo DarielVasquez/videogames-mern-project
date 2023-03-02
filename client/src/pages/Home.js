@@ -55,7 +55,7 @@ const Home = () => {
         gameImg: singleProduct.background_image,
         gameDesc: singleProduct.description_raw,
       };
-      console.log(dataGame);
+      // console.log(dataGame);
       const addFavoriteData = async () => {
         const request = await addFavorite(dataGame);
       };

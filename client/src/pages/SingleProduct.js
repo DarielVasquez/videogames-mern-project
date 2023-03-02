@@ -14,7 +14,7 @@ const SingleProduct = () => {
   );
   const isLoading = useSelector((state) => state.fetchSingleProduct.isLoading);
   const error = useSelector((state) => state.fetchSingleProduct.error);
-  console.log(singleProduct);
+  // console.log(singleProduct);
 
   useEffect(() => {
     if (id) dispatch(fetchSingleProduct(id));

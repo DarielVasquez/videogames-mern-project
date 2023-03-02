@@ -200,3 +200,45 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
+
+/* input */
+
+.input-form {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.input-form:focus {
+  box-shadow: 0 0 0 0.2rem rgba(167, 167, 167, 0.25);
+}
+
+.show-password {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+}
+
+.is-invalid {
+  border-color: #dc3545;
+  background-color: #fff;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  display: block;
+  font-size: 1.25rem;
+  margin-top: 0.25rem;
+  text-align: center;
+}
