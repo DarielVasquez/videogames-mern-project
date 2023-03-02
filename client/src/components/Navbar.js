@@ -3,13 +3,19 @@ import { Link, NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchQuery } from "../actions";
 import Loading from "./Loading";
+import Cookies from "universal-cookie";
+import { loginUserAction, logoutUser } from "../actions";
+import LogoutModal from "./LogoutModal";
 
 const Navbar = () => {
   const dispatch = useDispatch();
+  const cookies = new Cookies();
   const [searchValue, setSearchValue] = useState("");
   const [showResults, setShowResults] = useState(false);
   const queryProducts = useSelector((state) => state.fetchQuery.queryProducts);
   const isLoading = useSelector((state) => state.fetchQuery.isLoading);
+  const inputRef = useRef(null);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -26,6 +32,15 @@ const Navbar = () => {
       setShowResults(false);
     }
   }, [searchValue]);
+
+  useEffect(() => {
+    const cookieValue = !!cookies.get("jwtToken");
+    if (cookieValue) {
+      dispatch(loginUserAction());
+    } else {
+      dispatch(logoutUser());
+    }
+  }, []);
 
   return (
     <nav className="top-area">
@@ -49,6 +64,7 @@ const Navbar = () => {
                   name="search"
                   placeholder="Search"
                   value={searchValue}
+                  ref={inputRef}
                   autoComplete="off"
                   onChange={handleChange}
                   onFocus={() => searchValue.length && setShowResults(true)}
@@ -118,108 +134,39 @@ const Navbar = () => {
           <div className="container">
             <div className="attr-nav">
               <ul>
-                <li className="search">
-                  <a href="#">
+                <li className="search" onClick={() => inputRef.current.focus()}>
+                  <a>
                     <span className="lnr lnr-magnifier"></span>
                   </a>
                 </li>
-                <li className="nav-setting">
-                  <a href="#">
+                <li className="">
+                  <Link to={"/favorites"}>
                     <span className="lnr lnr-heart"></span>
-                  </a>
+                  </Link>
                 </li>
-                <li className="nav-setting">
-                  <a href="#">
+                <li className="dropdown">
+                  <a className="dropdown-toggle" data-toggle="dropdown">
                     <span className="lnr lnr-cog"></span>
                   </a>
-                </li>
-                {/* <li className="dropdown">
-                  <a
-                    href="#"
-                    className="dropdown-toggle"
-                    data-toggle="dropdown"
-                  >
-                    <span className="lnr lnr-cart"></span>
-                    <span className="badge badge-bg-1">2</span>
-                  </a>
                   <ul className="dropdown-menu cart-list s-cate">
-                    <li className="single-cart-list">
-                      <a href="#" className="photo">
-                        <img
-                          src="assets/images/collection/arrivals1.png"
-                          className="cart-thumb"
-                          alt="image"
-                        />
-                      </a>
-                      <div className="cart-list-txt">
-                        <h6>
-                          <a href="#">
-                            arm <br /> chair
-                          </a>
-                        </h6>
-                        <p>
-                          1 x - <span className="price">$180.00</span>
-                        </p>
-                      </div>
-                      <div className="cart-close">
-                        <span className="lnr lnr-cross"></span>
-                      </div>
+                    <li>
+                      {isLoggedIn ? (
+                        <Link to={"/user"} className="dropdown-item">
+                          user
+                        </Link>
+                      ) : (
+                        <Link to={"/login"} className="dropdown-item">
+                          login
+                        </Link>
+                      )}
                     </li>
-                    <li className="single-cart-list">
-                      <a href="#" className="photo">
-                        <img
-                          src="assets/images/collection/arrivals2.png"
-                          className="cart-thumb"
-                          alt="image"
-                        />
-                      </a>
-                      <div className="cart-list-txt">
-                        <h6>
-                          <a href="#">
-                            single <br /> armchair
-                          </a>
-                        </h6>
-                        <p>
-                          1 x - <span className="price">$180.00</span>
-                        </p>
-                      </div>
-                      <div className="cart-close">
-                        <span className="lnr lnr-cross"></span>
-                      </div>
-                    </li>
-                    <li className="single-cart-list">
-                      <a href="#" className="photo">
-                        <img
-                          src="assets/images/collection/arrivals3.png"
-                          className="cart-thumb"
-                          alt="image"
-                        />
-                      </a>
-                      <div className="cart-list-txt">
-                        <h6>
-                          <a href="#">
-                            wooden arn <br /> chair
-                          </a>
-                        </h6>
-                        <p>
-                          1 x - <span className="price">$180.00</span>
-                        </p>
-                      </div>
-                      <div className="cart-close">
-                        <span className="lnr lnr-cross"></span>
-                      </div>
-                    </li>
-                    <li className="total">
-                      <span>Total: $0.00</span>
-                      <button
-                        className="btn-cart pull-right"
-                        // onClick="window.location.href='#'"
-                      >
-                        view cart
-                      </button>
-                    </li>
+                    {isLoggedIn && (
+                      <li>
+                        <LogoutModal />
+                      </li>
+                    )}
                   </ul>
-                </li> */}
+                </li>
               </ul>
             </div>
 
@@ -254,12 +201,7 @@ const Navbar = () => {
                   </li>
                   <li className="nav-item navbar-item">
                     <Link className="nav-link" to={"/"}>
-                      products
-                    </Link>
-                  </li>
-                  <li className="nav-item navbar-item">
-                    <Link className="nav-link" to={"/favorites"}>
-                      favorites
+                      explore
                     </Link>
                   </li>
                   <li className="nav-item navbar-item">
