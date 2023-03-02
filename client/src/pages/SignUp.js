@@ -65,7 +65,7 @@ const SignUp = () => {
         }
       }
       if (signupData.status === "success") {
-        const loginData = await loginUser({ email, password });
+        const loginData = await loginUser({ username, password });
         if (loginData.status === "success") {
           dispatch(loginUserAction());
           navigate("/");

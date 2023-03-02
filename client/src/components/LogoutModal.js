@@ -11,7 +11,6 @@ const LogoutModal = () => {
 
   const handleLogout = async () => {
     const token = cookies.remove("jwtToken");
-    const userId = cookies.remove("userId");
     dispatch(logoutUser());
     setShowModal(false);
   };

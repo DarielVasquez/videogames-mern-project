@@ -7,9 +7,8 @@ const cookies = new Cookies();
 export const loginUser = async (user) => {
   try {
     const response = await axios.post(API_URL, user);
-    if (response.data.token && response.data.userId) {
+    if (response.data.token) {
       cookies.set("jwtToken", response.data.token, { path: "/" });
-      cookies.set("userId", response.data.userId, { path: "/" });
     }
     return response.data;
   } catch (error) {

@@ -9,7 +9,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cookies = new Cookies();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
@@ -19,8 +19,8 @@ const Login = () => {
     }
   }, []);
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -29,10 +29,10 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loginData = await loginUser({ email, password });
+    const loginData = await loginUser({ username, password });
     if (loginData.status === "failure") {
-      if (loginData.message.includes("email")) {
-        setErrors({ email: loginData.message });
+      if (loginData.message.includes("username")) {
+        setErrors({ username: loginData.message });
       }
       if (loginData.message.includes("password")) {
         setErrors({ password: loginData.message });
@@ -69,21 +69,21 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: "20px" }}>
               <label
-                htmlFor="email"
+                htmlFor="username"
                 style={{ display: "block", marginBottom: "5px" }}
               >
-                Email:
+                Username:
               </label>
               <input
-                className={`input-form ${errors.email ? "is-invalid" : ""}`}
+                className={`input-form ${errors.username ? "is-invalid" : ""}`}
                 type="text"
-                id="email"
-                name="email"
-                value={email}
-                onChange={handleEmailChange}
+                id="username"
+                name="username"
+                value={username}
+                onChange={handleUsernameChange}
               />
-              {errors.email && (
-                <div className="invalid-feedback">{errors.email}</div>
+              {errors.username && (
+                <div className="invalid-feedback">{errors.username}</div>
               )}
             </div>
             <div style={{ marginBottom: "20px" }}>
