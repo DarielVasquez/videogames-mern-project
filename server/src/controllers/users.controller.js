@@ -47,9 +47,11 @@ export default class UsersController {
   static async apiUpdateUser(req, res, next) {
     try {
       const userId = req.user._id;
-      const { name, username, password, email } = req.body;
+      const { name, username, password, confirmPassword, email } = req.body;
       //password encryption
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = password
+        ? await bcrypt.hash(password, 10)
+        : await bcrypt.hash(confirmPassword, 10);
       const { status, message } = await UsersModel.updateUser({
         userId,
         name,
@@ -63,7 +65,7 @@ export default class UsersController {
       };
       res.json(response);
     } catch (e) {
-      console.error(`Unable to remove user, ${e}`);
+      console.error(`Unable to update user, ${e}`);
       res.status(500).json({ error: e });
     }
   }

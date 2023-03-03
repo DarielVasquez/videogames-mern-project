@@ -26,7 +26,7 @@ export const addUser = async (newUser) => {
 
 export const updateUser = async (updateUser) => {
   try {
-    const response = await axios.put(API_URL, updateUser, {
+    const response = await axios.patch(API_URL, updateUser, {
       withCredentials: true,
     });
     return response.data;
