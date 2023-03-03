@@ -8,6 +8,6 @@ router
   .route("/")
   .get(verifyToken, FavoritesController.apiGetFavorites)
   .post(verifyToken, FavoritesController.apiAddFavorite)
-  .delete(FavoritesController.apiRemoveFavorite);
+  .delete(verifyToken, FavoritesController.apiRemoveFavorite);
 
 export default router;

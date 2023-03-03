@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Cookies from "universal-cookie";
-import { logoutUser } from "../actions";
+import { logoutUserAction } from "../actions";
+import { logoutUser } from "../services/logout";
 
 const LogoutModal = () => {
   const dispatch = useDispatch();
-  const cookies = new Cookies();
   const [showModal, setShowModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      setMounted(false);
+    };
+  }, []);
 
   const handleLogout = async () => {
-    const token = cookies.remove("jwtToken");
-    dispatch(logoutUser());
-    setShowModal(false);
+    const logout = await logoutUser();
+    if (mounted) {
+      dispatch(logoutUserAction());
+      setShowModal((prevState) => !prevState);
+    }
   };
 
   return (

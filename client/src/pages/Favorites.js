@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { deleteFavorite, getFavorites } from "../services/favorites";
 import { useSelector } from "react-redux";
-import Cookies from "universal-cookie";
 import Loading from "../components/Loading";
+import { isUserLogged } from "../services/login";
 
 const Favorites = () => {
   const navigate = useNavigate();
-  const cookies = new Cookies();
   const [favorites, setFavorites] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,13 +21,17 @@ const Favorites = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    if (cookies.get("jwtToken")) {
+  const verifyUser = async () => {
+    const user = await isUserLogged();
+    if (user.status === "success") {
       fetchFavorites();
-    }
-    if (!cookies.get("jwtToken")) {
+    } else {
       navigate("/login");
     }
+  };
+
+  useEffect(() => {
+    verifyUser();
   }, []);
 
   if (isLoading) {
@@ -36,7 +39,7 @@ const Favorites = () => {
   }
   return (
     <main className="container">
-      {favorites.length === 0 ? (
+      {favorites?.length === 0 ? (
         <div style={{ textAlign: "center" }}>no favorites added</div>
       ) : (
         <div

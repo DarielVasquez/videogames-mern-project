@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import Cookies from "universal-cookie";
 import { addUser } from "../services/user";
 import { loginUser } from "../services/login";
 import { loginUserAction } from "../actions";
+import { isUserLogged } from "../services/login";
 
 const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const cookies = new Cookies();
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -21,10 +20,15 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  useEffect(() => {
-    if (cookies.get("jwtToken")) {
+  const verifyUser = async () => {
+    const user = await isUserLogged();
+    if (user.status === "success") {
       navigate("/");
     }
+  };
+
+  useEffect(() => {
+    verifyUser();
   }, []);
 
   const handleInputChange = (event) => {

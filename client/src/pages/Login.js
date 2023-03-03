@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import Cookies from "universal-cookie";
 import { loginUser } from "../services/login";
 import { loginUserAction } from "../actions";
+import { isUserLogged } from "../services/login";
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const cookies = new Cookies();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    if (cookies.get("jwtToken")) {
+  const verifyUser = async () => {
+    const user = await isUserLogged();
+    if (user.status === "success") {
       navigate("/");
     }
+  };
+
+  useEffect(() => {
+    verifyUser();
   }, []);
 
   const handleUsernameChange = (e) => {

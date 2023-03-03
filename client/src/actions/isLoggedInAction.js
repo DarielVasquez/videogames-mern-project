@@ -6,7 +6,7 @@ export const loginUserAction = () => {
   };
 };
 
-export const logoutUser = () => {
+export const logoutUserAction = () => {
   return {
     type: LOGOUT_USER,
   };

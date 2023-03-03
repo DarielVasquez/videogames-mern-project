@@ -4,7 +4,7 @@ import UsersModel from "../models/users.model.js";
 export default class UsersController {
   static async apiGetUser(req, res, next) {
     try {
-      const userId = req.cookies.userId;
+      const userId = req.user._id;
       const { user, status, message } = await UsersModel.getUser({
         userId,
       });
@@ -46,7 +46,7 @@ export default class UsersController {
 
   static async apiUpdateUser(req, res, next) {
     try {
-      const userId = req.cookies.userId;
+      const userId = req.user._id;
       const { name, username, password, email } = req.body;
       //password encryption
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -70,7 +70,7 @@ export default class UsersController {
 
   static async apiRemoveUser(req, res, next) {
     try {
-      const userId = req.cookies.userId;
+      const userId = req.user._id;
       const { status, message } = await UsersModel.removeUser({
         userId,
       });

@@ -3,13 +3,12 @@ import { Link, NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchQuery } from "../actions";
 import Loading from "./Loading";
-import Cookies from "universal-cookie";
-import { loginUserAction, logoutUser } from "../actions";
+import { loginUserAction, logoutUserAction } from "../actions";
 import LogoutModal from "./LogoutModal";
+import { isUserLogged } from "../services/login";
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const cookies = new Cookies();
   const [searchValue, setSearchValue] = useState("");
   const [showResults, setShowResults] = useState(false);
   const queryProducts = useSelector((state) => state.fetchQuery.queryProducts);
@@ -33,13 +32,17 @@ const Navbar = () => {
     }
   }, [searchValue]);
 
-  useEffect(() => {
-    const cookieValue = !!cookies.get("jwtToken");
-    if (cookieValue) {
-      dispatch(loginUserAction());
+  const verifyUser = async () => {
+    const user = await isUserLogged();
+    if (user.status === "failure") {
+      dispatch(logoutUserAction());
     } else {
-      dispatch(logoutUser());
+      dispatch(loginUserAction());
     }
+  };
+
+  useEffect(() => {
+    verifyUser();
   }, []);
 
   return (
@@ -140,9 +143,11 @@ const Navbar = () => {
                   </a>
                 </li>
                 <li className="">
-                  <Link to={"/favorites"}>
-                    <span className="lnr lnr-heart"></span>
-                  </Link>
+                  {isLoggedIn && (
+                    <Link to={"/favorites"}>
+                      <span className="lnr lnr-heart"></span>
+                    </Link>
+                  )}
                 </li>
                 <li className="dropdown">
                   <a className="dropdown-toggle" data-toggle="dropdown">
@@ -205,7 +210,7 @@ const Navbar = () => {
                     </Link>
                   </li>
                   <li className="nav-item navbar-item">
-                    <Link className="nav-link" to={"/"}>
+                    <Link className="nav-link" to={"/about"}>
                       about
                     </Link>
                   </li>

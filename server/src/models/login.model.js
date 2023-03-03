@@ -16,9 +16,9 @@ export default class LoginModel {
     }
   }
 
-  static async loginUser({ email, password }) {
+  static async loginUser({ username, password }) {
     // retrieve the user from the database
-    const user = await users.findOne({ email });
+    const user = await users.findOne({ username });
 
     //check if the user exists
     if (user) {
@@ -29,18 +29,16 @@ export default class LoginModel {
         const payload = {
           _id: user._id,
           password: user.password,
-          email: user.email,
+          username: user.username,
         };
         const token = jwt.sign(payload, process.env.SECRET_KEY);
         return {
-          userId: user._id,
           token: token,
           status: "success",
           message: "User was authenticated",
         };
       } else {
         return {
-          userId: "",
           token: "",
           status: "failure",
           message: "The password is incorrect",
@@ -48,10 +46,9 @@ export default class LoginModel {
       }
     } else {
       return {
-        userId: "",
         token: "",
         status: "failure",
-        message: "The email is incorrect",
+        message: "The username is incorrect",
       };
     }
   }

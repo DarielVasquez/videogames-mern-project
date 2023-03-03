@@ -2,7 +2,7 @@ import FavoritesModel from "../models/favorites.model.js";
 
 export default class FavoritesController {
   static async apiGetFavorites(req, res, next) {
-    const userId = req.cookies.userId;
+    const userId = req.user._id;
     try {
       const { favoritesList, totalNumFavorites } =
         await FavoritesModel.getFavoritesById({ userId });
@@ -18,7 +18,7 @@ export default class FavoritesController {
 
   static async apiAddFavorite(req, res, next) {
     try {
-      const userId = req.cookies.userId;
+      const userId = req.user._id;
       const gameId = req.body.gameId;
       const gameName = req.body.gameName;
       const gameImg = req.body.gameImg;
@@ -49,7 +49,7 @@ export default class FavoritesController {
 
   static async apiRemoveFavorite(req, res, next) {
     try {
-      const userId = req.cookies.userId;
+      const userId = req.user._id;
       const gameId = req.body.gameId;
       if (!gameId) {
         res.status(400).json({ error: "Game ID required" });
