@@ -206,12 +206,12 @@ const SignUp = () => {
                     borderBottomRightRadius: "0",
                   }}
                 />
-                <button className="show-password" onClick={handleShowPassword}>
+                <div className="show-password" onClick={handleShowPassword}>
                   <span
                     className="lnr lnr-eye"
                     style={{ cursor: "pointer" }}
                   ></span>
-                </button>
+                </div>
               </div>
               {errors.password && (
                 <div className="invalid-feedback">{errors.password}</div>
@@ -239,7 +239,7 @@ const SignUp = () => {
                     borderBottomRightRadius: "0",
                   }}
                 />
-                <button
+                <div
                   className="show-password"
                   onClick={handleShowConfirmPassword}
                 >
@@ -247,7 +247,7 @@ const SignUp = () => {
                     className="lnr lnr-eye"
                     style={{ cursor: "pointer" }}
                   ></span>
-                </button>
+                </div>
               </div>
               {errors.confirmPassword && (
                 <div className="invalid-feedback">{errors.confirmPassword}</div>

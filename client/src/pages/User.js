@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getUserById, updateUser, removeUser } from "../services/user";
 import { loginUser } from "../services/login";
+import { logoutUser } from "../services/logout";
+import { logoutUserAction } from "../actions";
 
 const User = () => {
   const dispatch = useDispatch();
@@ -19,6 +21,9 @@ const User = () => {
   const [changePassword, setChangePassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [removeUserPassword, setRemoveUserPassword] = useState("");
+  const [showRemovePassword, setShowRemovePassword] = useState(false);
 
   const verifyUser = async () => {
     const user = await getUserById();
@@ -38,10 +43,6 @@ const User = () => {
     });
   };
 
-  const handleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
   const handleShowConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
@@ -52,84 +53,67 @@ const User = () => {
 
   const handleEditClick = () => {
     setIsEditing(true);
+    setFormData({ ...formData, password: "", newPassword: "" });
   };
 
-  const handleDeleteClick = () => {
-    // code to delete user
+  const handleDeleteClick = async () => {
+    const confirmPassword = removeUserPassword;
+    const data = await removeUser(confirmPassword);
+    if (data.status === "failure") {
+      if (data.message.toLowerCase().includes("password")) {
+        setErrors({ password: data.message });
+      }
+    }
+    if (data.status === "success") {
+      const logout = await logoutUser();
+      if (logout.status === "success") {
+        dispatch(logoutUserAction());
+        setShowModal(!showModal);
+        navigate("/");
+      }
+    }
   };
 
   const handleSaveClick = async () => {
     const newErrors = validateFormData(formData);
     if (Object.keys(newErrors).length === 0) {
       const { name, username, email, password, newPassword } = formData;
-      if (!changePassword) {
-        const data = await updateUser({
-          name,
-          username,
-          email,
-          confirmPassword: password,
-          password: password,
-        });
-        if (data.status === "failure") {
-          if (data.message.toLowerCase().includes("password")) {
-            setErrors({ password: data.message });
-          }
-          if (data.message.toLowerCase().includes("username")) {
-            setErrors({ username: data.message });
-          }
-          if (data.message.toLowerCase().includes("email")) {
-            setErrors({ email: data.message });
-          }
+      const data = await updateUser({
+        name,
+        username,
+        email,
+        confirmPassword: password,
+        password: changePassword ? newPassword : password,
+      });
+      if (data.status === "failure") {
+        if (data.message.toLowerCase().includes("username")) {
+          setErrors({ username: data.message });
         }
-        if (data.status === "success") {
-          const login = await loginUser({ username, password });
-          setFormData({ ...formData, password: "", newPassword: "" });
-          setErrors({});
-          setIsEditing(!isEditing);
+        if (data.message.toLowerCase().includes("email")) {
+          setErrors({ email: data.message });
         }
-      } else {
-        const data = await updateUser({
-          name,
-          username,
-          email,
-          confirmPassword: password,
-          password: newPassword,
-        });
-        if (data.status === "failure") {
-          if (data.message.toLowerCase().includes("username")) {
-            setErrors({ username: data.message });
-          }
-          if (data.message.toLowerCase().includes("email")) {
-            setErrors({ email: data.message });
-          }
-          if (data.message.toLowerCase().includes("password")) {
-            setErrors({ password: data.message });
-          }
-        }
-        if (data.status === "success") {
-          const login = await loginUser({ username, password: newPassword });
-          setFormData({ ...formData, password: "", newPassword: "" });
-          setErrors({});
-          setIsEditing(!isEditing);
+        if (data.message.toLowerCase().includes("password")) {
+          setErrors({ password: data.message });
         }
       }
-      // const signupData = await addUser(data);
-      // if (signupData.status === "success") {
-      //   const loginData = await loginUser({ username, password });
-      //   if (loginData.status === "success") {
-      //     dispatch(loginUserAction());
-      //     navigate("/");
-      //   }
-      // }
+      if (data.status === "success") {
+        const login = await loginUser({
+          username,
+          password: changePassword ? newPassword : password,
+        });
+        setFormData({ ...formData, password: "", newPassword: "" });
+        setErrors({});
+        setIsEditing(!isEditing);
+      }
     } else {
       setErrors(newErrors);
     }
-    // setIsEditing(false);
   };
 
   const handleCancelClick = () => {
     verifyUser();
-    setIsEditing(false);
+    setIsEditing(!isEditing);
+    setErrors({});
   };
 
   const validateFormData = (data) => {
@@ -243,45 +227,76 @@ const User = () => {
                       <label htmlFor="password">
                         {changePassword ? `Old Password` : `Confirm Password:`}
                       </label>
-                      <input
-                        type="password"
-                        className={`input-form ${
-                          errors.password ? "is-invalid" : ""
-                        }`}
-                        style={{ border: !isEditing && "1px solid white" }}
-                        readOnly={!isEditing}
-                        disabled={!isEditing}
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                      />
+                      <div style={{ display: "flex", flexDirection: "row" }}>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className={`input-form ${
+                            errors.password ? "is-invalid" : ""
+                          }`}
+                          style={{
+                            border: !isEditing && "1px solid white",
+                            borderTopRightRadius: "0",
+                            borderBottomRightRadius: "0",
+                          }}
+                          readOnly={!isEditing}
+                          disabled={!isEditing}
+                          id="password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                        />
+                        <div
+                          className="show-password"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          <span
+                            className="lnr lnr-eye"
+                            style={{ cursor: "pointer" }}
+                          ></span>
+                        </div>
+                      </div>
                       {errors.password && (
                         <div className="invalid-feedback">
                           {errors.password}
                         </div>
                       )}
                     </div>
-                    <button type="button" onClick={handleChangePassword}>
-                      Change Password
-                    </button>
                     {changePassword && (
                       <>
                         <div style={{ marginBottom: "20px" }}>
                           <label htmlFor="password">New Password</label>
-                          <input
-                            type="password"
-                            className={`input-form ${
-                              errors.newPassword ? "is-invalid" : ""
-                            }`}
-                            style={{ border: !isEditing && "1px solid white" }}
-                            readOnly={!isEditing}
-                            disabled={!isEditing}
-                            id="newPassword"
-                            name="newPassword"
-                            value={formData.newPassword}
-                            onChange={handleInputChange}
-                          />
+                          <div
+                            style={{ display: "flex", flexDirection: "row" }}
+                          >
+                            <input
+                              type={showConfirmPassword ? "text" : "password"}
+                              className={`input-form ${
+                                errors.newPassword ? "is-invalid" : ""
+                              }`}
+                              style={{
+                                border: !isEditing && "1px solid white",
+                                borderTopRightRadius: "0",
+                                borderBottomRightRadius: "0",
+                              }}
+                              readOnly={!isEditing}
+                              disabled={!isEditing}
+                              id="newPassword"
+                              name="newPassword"
+                              value={formData.newPassword}
+                              onChange={handleInputChange}
+                            />
+                            <div
+                              className="show-password"
+                              onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                              }
+                            >
+                              <span
+                                className="lnr lnr-eye"
+                                style={{ cursor: "pointer" }}
+                              ></span>
+                            </div>
+                          </div>
                           {errors.newPassword && (
                             <div className="invalid-feedback">
                               {errors.newPassword}
@@ -290,10 +305,22 @@ const User = () => {
                         </div>
                       </>
                     )}
+                    <div
+                      onClick={handleChangePassword}
+                      className="btn btn-warning"
+                      style={{
+                        textAlign: "center",
+                        margin: "10px 0 15px 0",
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {!changePassword ? "Change Password" : "Cancel Change"}
+                    </div>
                   </>
                 )}
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                  <button
+                  <div
                     className="btn btn-primary mr-2"
                     style={{
                       marginBottom: "20px",
@@ -304,15 +331,14 @@ const User = () => {
                       color: "#fff",
                       border: "none",
                       margin: "10px",
+                      marginLeft: "0px",
                     }}
-                    onClick={() =>
-                      isEditing ? handleSaveClick() : handleEditClick()
-                    }
+                    onClick={isEditing ? handleSaveClick : handleEditClick}
                   >
                     {isEditing ? "Save" : "Edit"}
-                  </button>
-                  <button
-                    className="btn btn-secondary"
+                  </div>
+                  <div
+                    className={`btn btn-${isEditing ? "secondary" : "danger"} `}
                     style={{
                       marginBottom: "20px",
                       display: "block",
@@ -321,16 +347,91 @@ const User = () => {
                       borderRadius: "5px",
                       border: "1px solid #ccc",
                       margin: "10px",
+                      marginRight: "0px",
                     }}
                     onClick={() =>
-                      isEditing ? handleCancelClick() : handleDeleteClick()
+                      isEditing ? handleCancelClick() : setShowModal(!showModal)
                     }
                   >
                     {isEditing ? "Cancel" : "Delete"}
-                  </button>
+                  </div>
                 </div>
               </>
             }
+          </div>
+        </div>
+      </div>
+      <div
+        className={`modal${showModal ? " d-block modal-backdrop" : ""}`}
+        tabIndex="-1"
+        role="dialog"
+        style={{ zIndex: "9999" }}
+      >
+        <div className="modal-dialog modal-dialog-centered" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Delete</h5>
+              <button
+                type="button"
+                className="close"
+                aria-label="Close"
+                onClick={() => setShowModal(!showModal)}
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              Confirm password:
+              <div
+                style={{ display: "flex", flexDirection: "row", margin: "5px" }}
+              >
+                <input
+                  type={showRemovePassword ? "text" : "password"}
+                  className={`input-form ${
+                    errors.password ? "is-invalid" : ""
+                  }`}
+                  style={{
+                    borderTopRightRadius: "0",
+                    borderBottomRightRadius: "0",
+                  }}
+                  id="password"
+                  name="password"
+                  value={removeUserPassword}
+                  onChange={(e) => setRemoveUserPassword(e.target.value)}
+                />
+                <div
+                  className="show-password"
+                  onClick={() => setShowRemovePassword(!showRemovePassword)}
+                >
+                  <span
+                    className="lnr lnr-eye"
+                    style={{ cursor: "pointer" }}
+                  ></span>
+                </div>
+              </div>
+              {errors.password && (
+                <div className="invalid-feedback">{errors.password}</div>
+              )}
+              <p style={{ textTransform: "none", margin: "5px" }}>
+                Are you sure you want to delete this account?
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowModal(!showModal)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleDeleteClick}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       </div>

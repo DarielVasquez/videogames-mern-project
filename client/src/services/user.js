@@ -35,9 +35,12 @@ export const updateUser = async (updateUser) => {
   }
 };
 
-export const removeUser = async () => {
+export const removeUser = async (confirmPassword) => {
   try {
     const response = await axios.delete(API_URL, {
+      data: {
+        confirmPassword,
+      },
       withCredentials: true,
     });
     return response.data;

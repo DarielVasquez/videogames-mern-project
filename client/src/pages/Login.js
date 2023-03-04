@@ -8,9 +8,15 @@ import { isUserLogged } from "../services/login";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const verifyUser = async () => {
     const user = await isUserLogged();
@@ -23,16 +29,21 @@ const Login = () => {
     verifyUser();
   }, []);
 
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { username, password } = formData;
     const loginData = await loginUser({ username, password });
     if (loginData.status === "failure") {
       if (loginData.message.includes("username")) {
@@ -83,8 +94,8 @@ const Login = () => {
                 type="text"
                 id="username"
                 name="username"
-                value={username}
-                onChange={handleUsernameChange}
+                value={formData.username}
+                onChange={handleInputChange}
               />
               {errors.username && (
                 <div className="invalid-feedback">{errors.username}</div>
@@ -97,14 +108,31 @@ const Login = () => {
               >
                 Password:
               </label>
-              <input
-                className={`input-form ${errors.password ? "is-invalid" : ""}`}
-                type="password"
-                id="password"
-                name="password"
-                value={password}
-                onChange={handlePasswordChange}
-              />
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <input
+                  className={`input-form ${
+                    errors.password ? "is-invalid" : ""
+                  }`}
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  style={{
+                    borderTopRightRadius: "0",
+                    borderBottomRightRadius: "0",
+                  }}
+                />
+                <div
+                  className="show-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <span
+                    className="lnr lnr-eye"
+                    style={{ cursor: "pointer" }}
+                  ></span>
+                </div>
+              </div>
               {errors.password && (
                 <div className="invalid-feedback">{errors.password}</div>
               )}

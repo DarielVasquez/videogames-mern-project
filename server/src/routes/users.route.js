@@ -10,6 +10,6 @@ router
   .get(verifyToken, UsersController.apiGetUser)
   .post(UsersController.apiAddUser)
   .patch(verifyToken, checkPassword, UsersController.apiUpdateUser)
-  .delete(verifyToken, UsersController.apiRemoveUser);
+  .delete(verifyToken, checkPassword, UsersController.apiRemoveUser);
 
 export default router;
