@@ -47,6 +47,33 @@ export default class FavoritesController {
     }
   }
 
+  static async apiUpdateFavorites(req, res, next) {
+    try {
+      const userId = req.user._id;
+      const favorites = req.body.favorites;
+      if (!favorites) {
+        res.status(400).json({ error: "Favorites array required" });
+        return;
+      }
+      if (!userId) {
+        res.status(400).json({ error: "User ID required" });
+        return;
+      }
+      const { status, message } = await FavoritesModel.updateFavorites({
+        favorites,
+        userId,
+      });
+      let response = {
+        status: status,
+        message: message,
+      };
+      res.json(response);
+    } catch (e) {
+      console.error(`Unable to update user favorites, ${e}`);
+      res.status(500).json({ error: e });
+    }
+  }
+
   static async apiRemoveFavorite(req, res, next) {
     try {
       const userId = req.user._id;

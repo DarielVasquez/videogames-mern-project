@@ -78,6 +78,25 @@ export default class FavoritesModel {
     }
   }
 
+  static async updateFavorites({ userId, favorites }) {
+    try {
+      const user = await users.findOneAndUpdate(
+        { _id: ObjectId(userId) },
+        { $set: { favorites: favorites } }
+      );
+      return {
+        status: "success",
+        message: "User's favorites has been updated",
+      };
+    } catch (e) {
+      console.error(`Unable to update favorites list, ${e}`);
+      return {
+        status: "failure",
+        message: `Unable to update favorites list, ${e}`,
+      };
+    }
+  }
+
   static async removeFavorite({ userId, gameId }) {
     try {
       const user = await users.findOneAndUpdate(
