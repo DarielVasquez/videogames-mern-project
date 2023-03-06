@@ -242,3 +242,11 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   margin-top: 0.25rem;
   text-align: center;
 }
+
+/* title */
+
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}

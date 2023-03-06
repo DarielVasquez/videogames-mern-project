@@ -4,6 +4,8 @@ import { deleteFavorite, getFavorites } from "../services/favorites";
 import { useSelector } from "react-redux";
 import Loading from "../components/Loading";
 import { isUserLogged } from "../services/login";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { updateFavorites } from "../services/favorites";
 
 const Favorites = () => {
   const navigate = useNavigate();
@@ -34,108 +36,159 @@ const Favorites = () => {
     verifyUser();
   }, []);
 
+  // sortable table
+  const handleOnDragEnd = async (result) => {
+    if (!result.destination) return;
+    const items = Array.from(favorites);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setFavorites(items);
+    const update = await updateFavorites({ favorites: items });
+  };
+
   if (isLoading) {
     return <Loading />;
   }
   return (
-    <main className="container">
+    <main
+      className="container"
+      style={{
+        marginTop: "100px",
+      }}
+    >
+      <h2 className="title">Favorites</h2>
       {favorites?.length === 0 ? (
         <div style={{ textAlign: "center" }}>no favorites added</div>
       ) : (
-        <div
-          className="row justify-content-md-center"
-          style={{ marginTop: "150px" }}
-        >
-          <div className="col-sm">
-            <table
-              className="table table-striped table-bordered table-hover"
-              style={{
-                backgroundColor: "rgb(248, 249, 252)",
-                width: "100%",
-                textAlign: "center",
-              }}
-            >
-              <thead>
-                <tr
-                  style={{
-                    backgroundColor: "#e99c2e",
-                    color: "white",
-                  }}
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <div className="row justify-content-md-center">
+            <Droppable droppableId="items">
+              {(provided) => (
+                <div
+                  className="col-sm"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
                 >
-                  <th scope="col">#</th>
-                  <th scope="col">Image</th>
-                  <th scope="col">Name</th>
-                  <th scope="col" className="table-desc">
-                    Description
-                  </th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {favorites?.map((game, index) => {
-                  const {
-                    game_id,
-                    game_name,
-                    game_img,
-                    game_desc,
-                    date_added,
-                  } = game;
-                  return (
-                    <tr style={{ width: "85vw" }} key={game_id}>
-                      <th style={{ width: "5%" }}>{index + 1}</th>
-                      <td style={{ width: "15%" }}>
-                        <img
-                          src={game_img}
-                          alt={game_name}
-                          style={{
-                            width: "100px",
-                            height: "100px",
-                            borderRadius: "5px",
-                            objectFit: "cover",
-                          }}
-                        />
-                      </td>
-                      <td style={{ width: "30%" }}>
-                        <Link
-                          to={`/product/${game_id}`}
-                          style={{
-                            textAlign: "center",
-                            fontSize: "16px",
-                            color: "#a09e9c",
-                          }}
-                        >
-                          {game_name}
-                        </Link>
-                      </td>
-                      <td
-                        className="table-desc"
-                        style={{ width: "40%", textTransform: "none" }}
+                  <table
+                    className="table table-striped table-bordered table-hover"
+                    style={{
+                      backgroundColor: "rgb(248, 249, 252)",
+                      width: "100%",
+                      textAlign: "center",
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          backgroundColor: "#e99c2e",
+                          color: "white",
+                        }}
                       >
-                        {game_desc?.length > 250
-                          ? `${game_desc?.slice(0, 250)}...`
-                          : game_desc}
-                      </td>
-                      <td style={{ width: "10%" }}>
-                        <button
-                          onClick={() => handleRemoveFavorite(game_id)}
-                          className="btn btn-primary"
-                          style={{
-                            backgroundColor: "#e99c2e",
-                            color: "white",
-                            border: "none",
-                            fontSize: "16px",
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        <th scope="col"></th>
+                        <th scope="col">#</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Name</th>
+                        <th scope="col" className="table-desc">
+                          Description
+                        </th>
+                        <th scope="col">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {favorites?.map((game, index) => {
+                        const {
+                          game_id,
+                          game_name,
+                          game_img,
+                          game_desc,
+                          date_added,
+                        } = game;
+                        return (
+                          <Draggable
+                            key={game_id}
+                            draggableId={game_id.toString()}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <tr
+                                style={{ width: "85vw" }}
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                              >
+                                <th
+                                  style={{ width: "5%" }}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <span
+                                    className="lnr lnr-menu"
+                                    {...provided.dragHandleProps}
+                                  ></span>
+                                </th>
+                                <td style={{ width: "5%" }}>{index + 1}</td>
+                                <td style={{ width: "15%" }}>
+                                  <img
+                                    src={game_img}
+                                    alt={game_name}
+                                    style={{
+                                      width: "100px",
+                                      height: "100px",
+                                      borderRadius: "5px",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                </td>
+                                <td style={{ width: "30%" }}>
+                                  <Link
+                                    to={`/product/${game_id}`}
+                                    style={{
+                                      textAlign: "center",
+                                      fontSize: "16px",
+                                      color: "#a09e9c",
+                                    }}
+                                  >
+                                    {game_name}
+                                  </Link>
+                                </td>
+                                <td
+                                  className="table-desc"
+                                  style={{
+                                    width: "40%",
+                                    textTransform: "none",
+                                  }}
+                                >
+                                  {game_desc?.length > 250
+                                    ? `${game_desc?.slice(0, 250)}...`
+                                    : game_desc}
+                                </td>
+                                <td style={{ width: "5%" }}>
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveFavorite(game_id)
+                                    }
+                                    className="btn btn-danger"
+                                    style={{
+                                      fontSize: "16px",
+                                    }}
+                                  >
+                                    <span
+                                      className="lnr lnr-trash"
+                                      style={{ cursor: "pointer" }}
+                                    ></span>
+                                  </button>
+                                </td>
+                              </tr>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {provided.placeholder}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Droppable>
           </div>
-        </div>
+        </DragDropContext>
       )}
     </main>
   );

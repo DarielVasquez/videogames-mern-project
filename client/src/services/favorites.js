@@ -24,6 +24,17 @@ export const addFavorite = async (newFavorite) => {
   }
 };
 
+export const updateFavorites = async (arrayFavorites) => {
+  try {
+    const response = await axios.patch(API_URL, arrayFavorites, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const deleteFavorite = async (gameId) => {
   try {
     const response = await axios.delete(API_URL, {
