@@ -5,7 +5,7 @@ export default class FavoritesController {
     const userId = req.user._id;
     try {
       const { favoritesList, totalNumFavorites } =
-        await FavoritesModel.getFavoritesById({ userId });
+        await FavoritesModel.getFavorites({ userId });
       res.json({
         favorites: favoritesList,
         totalNumFavorites,
@@ -77,7 +77,7 @@ export default class FavoritesController {
   static async apiRemoveFavorite(req, res, next) {
     try {
       const userId = req.user._id;
-      const gameId = req.body.gameId;
+      const gameId = parseInt(req.query.gameId);
       if (!gameId) {
         res.status(400).json({ error: "Game ID required" });
         return;

@@ -15,15 +15,9 @@ export default class FavoritesModel {
     }
   }
 
-  static async getFavoritesById({ userId } = {}) {
-    let cursor;
+  static async getFavorites({ userId } = {}) {
     try {
-      cursor = await users.findOne({ _id: ObjectId(userId) });
-    } catch (e) {
-      console.error(`Unable to issue find command, ${e}`);
-      return { favoritesList: [], totalNumFavorites: 0 };
-    }
-    try {
+      const cursor = await users.findOne({ _id: ObjectId(userId) });
       const favoritesList = (await cursor?.favorites) || [];
       const totalNumFavorites = (await cursor?.favorites.length) || 0;
       return { favoritesList, totalNumFavorites };
