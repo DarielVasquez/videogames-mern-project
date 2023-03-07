@@ -37,10 +37,7 @@ export const updateFavorites = async (arrayFavorites) => {
 
 export const deleteFavorite = async (gameId) => {
   try {
-    const response = await axios.delete(API_URL, {
-      data: {
-        gameId,
-      },
+    const response = await axios.delete(`${API_URL}?gameId=${gameId}`, {
       withCredentials: true,
     });
     return response.data;

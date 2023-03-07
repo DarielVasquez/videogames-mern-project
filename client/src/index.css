@@ -250,3 +250,34 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   margin-bottom: 20px;
   text-align: center;
 }
+
+/* select */
+
+.form-select {
+  padding: 2px;
+  border-radius: 0.25rem;
+  border: 1px solid #ced4da;
+  background-color: #fff;
+}
+
+/* pagination */
+
+.pagination-nav {
+  display: flex;
+  margin: 0 10px 10px;
+  justify-content: space-between;
+}
+
+.pagination .page-item.active .page-link,
+.pagination .page-item:not(.disabled):not(.active) {
+  background-color: #e99c2e;
+  border-color: #e99c2e;
+}
+.pagination .page-link {
+  color: #e99c2e;
+}
+.pagination .page-link:hover {
+  background-color: #f9d6a7;
+  border-color: #f9d6a7;
+  color: white;
+}
