@@ -1,20 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchQuery } from "../actions";
-import Loading from "./Loading";
 import { loginUserAction, logoutUserAction } from "../actions";
 import LogoutModal from "./LogoutModal";
 import { isUserLogged } from "../services/login";
 
 const Navbar = () => {
   const dispatch = useDispatch();
+  const inputRef = useRef(null);
+  // search query
   const [searchValue, setSearchValue] = useState("");
   const [showResults, setShowResults] = useState(false);
+  // fetch query state
   const queryProducts = useSelector((state) => state.fetchQuery.queryProducts);
   const isLoading = useSelector((state) => state.fetchQuery.isLoading);
-  const inputRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
+  // logout modal
+  const [showModal, setShowModal] = useState(false);
+
+  // handle changes to search query
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -31,6 +36,8 @@ const Navbar = () => {
       setShowResults(false);
     }
   }, [searchValue]);
+
+  // verify whether user is logged in or not
 
   const verifyUser = async () => {
     const user = await isUserLogged();
@@ -71,29 +78,13 @@ const Navbar = () => {
                   autoComplete="off"
                   onChange={handleChange}
                   onFocus={() => searchValue.length && setShowResults(true)}
-                  onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                  onBlur={() => setTimeout(() => setShowResults(false), 225)}
                 />
                 <span className="input-group-addon close-search">
                   <i className="fa fa-times"></i>
                 </span>
                 {showResults && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "60px",
-                      left: "10%",
-                      right: "10%",
-                      zIndex: 1,
-                      background: "#fff",
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
-                      boxShadow: "0 2px 4px rgba(0,0,0,.1)",
-                      maxHeight: "300px",
-                      overflowY: "auto",
-                      padding: "10px",
-                      width: "80%",
-                    }}
-                  >
+                  <div className="search-results">
                     {isLoading ? (
                       <div
                         style={{ display: "flex", justifyContent: "center" }}
@@ -101,26 +92,13 @@ const Navbar = () => {
                         <div className="lds-dual-ring-sm"></div>
                       </div>
                     ) : queryProducts?.length === 0 ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          padding: "10px",
-                        }}
-                      >
-                        "No results available...
-                      </div>
+                      <div className="no-results-found">No results found</div>
                     ) : (
                       queryProducts?.map((result) => (
                         <div key={result.id}>
                           <Link
                             to={`/product/${result.id}`}
-                            style={{
-                              textAlign: "center",
-                              fontSize: "16px",
-                              color: "#a09e9c",
-                              padding: "5px",
-                            }}
+                            className="results-found"
                             onClick={() => setShowResults(false)}
                           >
                             {result.name}
@@ -167,12 +145,18 @@ const Navbar = () => {
                     </li>
                     {isLoggedIn && (
                       <li>
-                        <LogoutModal />
+                        <Link
+                          className="dropdown-item"
+                          onClick={() => setShowModal(true)}
+                        >
+                          logout
+                        </Link>
                       </li>
                     )}
                   </ul>
                 </li>
               </ul>
+              <LogoutModal showModal={showModal} setShowModal={setShowModal} />
             </div>
 
             <div className="navbar-header" style={{ backgroundColor: "white" }}>
