@@ -11,9 +11,12 @@ const Favorites = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  // pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [favoritesPerPage, setFavoritesPerPage] = useState(5);
-  const [totalFavorites, setTotalFavorites] = useState(0);
+  // search query
+  const [search, setSearch] = useState("");
+  const [filteredFavorites, setFilteredFavorites] = useState([]);
 
   // remove favorite
 
@@ -27,7 +30,7 @@ const Favorites = () => {
   const fetchFavorites = async () => {
     const favoritesData = await getFavorites(currentPage, favoritesPerPage);
     setFavorites(favoritesData.favorites);
-    setTotalFavorites(favoritesData.totalNumFavorites);
+    setFilteredFavorites(favoritesData.favorites);
     setIsLoading(false);
   };
 
@@ -52,6 +55,7 @@ const Favorites = () => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     setFavorites(items);
+    setFilteredFavorites(items);
     const update = await updateFavorites({ favorites: items });
   };
 
@@ -59,16 +63,25 @@ const Favorites = () => {
 
   const indexOfLastFavorite = currentPage * favoritesPerPage;
   const indexOfFirstFavorite = indexOfLastFavorite - favoritesPerPage;
-  const currentFavorites = favorites?.slice(
-    indexOfFirstFavorite,
-    indexOfLastFavorite
-  );
+  const totalFavorites = filteredFavorites.length;
 
   // limit favorites per page
 
   const handleLimitChange = (event) => {
     setCurrentPage(1);
     setFavoritesPerPage(Number(event.target.value));
+  };
+
+  // search input
+
+  const handleSearch = (e) => {
+    const searchValue = e.target.value;
+    setSearch(searchValue);
+    const filtered = favorites.filter((favorite) =>
+      favorite.game_name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredFavorites(filtered);
+    setCurrentPage(1);
   };
 
   if (isLoading) {
@@ -88,7 +101,7 @@ const Favorites = () => {
         <div style={{ textAlign: "center" }}>no favorites added</div>
       ) : (
         <>
-          <div style={{ display: "flex", margin: "15px" }}>
+          <div className="data-table">
             <div className="input-group mb-3">
               {`Show `}
               <select
@@ -105,6 +118,17 @@ const Favorites = () => {
                 <option value={20}>20</option>
               </select>
               {` entries`}
+            </div>
+            <div>
+              <input
+                type="text"
+                className={`input-form `}
+                id="name"
+                name="name"
+                value={search}
+                placeholder="Search..."
+                onChange={handleSearch}
+              />
             </div>
           </div>
           <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -134,7 +158,9 @@ const Favorites = () => {
                           <th scope="col"></th>
                           <th scope="col">#</th>
                           <th scope="col">Image</th>
-                          <th scope="col">Name</th>
+                          <th scope="col" className="table-title">
+                            Name
+                          </th>
                           <th scope="col" className="table-desc">
                             Description
                           </th>
@@ -142,98 +168,118 @@ const Favorites = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {currentFavorites?.map((game, index) => {
-                          const {
-                            game_id,
-                            game_name,
-                            game_img,
-                            game_desc,
-                            date_added,
-                          } = game;
-                          return (
-                            <Draggable
-                              key={game_id}
-                              draggableId={game_id.toString()}
-                              index={
-                                index + favoritesPerPage * (currentPage - 1)
-                              }
-                            >
-                              {(provided) => (
-                                <tr
-                                  style={{ width: "85vw" }}
-                                  {...provided.draggableProps}
-                                  ref={provided.innerRef}
+                        {filteredFavorites.length === 0 ? (
+                          <tr>
+                            <td colSpan="6">no results found</td>
+                          </tr>
+                        ) : (
+                          filteredFavorites
+                            .slice(indexOfFirstFavorite, indexOfLastFavorite)
+                            .map((game, index) => {
+                              const {
+                                game_id,
+                                game_name,
+                                game_img,
+                                game_desc,
+                                date_added,
+                              } = game;
+                              return (
+                                <Draggable
+                                  key={game_id}
+                                  draggableId={game_id.toString()}
+                                  isDragDisabled={search.length > 0}
+                                  index={
+                                    index + favoritesPerPage * (currentPage - 1)
+                                  }
                                 >
-                                  <th
-                                    style={{ width: "5%" }}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <span
-                                      className="lnr lnr-menu"
-                                      {...provided.dragHandleProps}
-                                    ></span>
-                                  </th>
-                                  <td style={{ width: "5%" }}>
-                                    {index +
-                                      favoritesPerPage * (currentPage - 1) +
-                                      1}
-                                  </td>
-                                  <td style={{ width: "15%" }}>
-                                    <img
-                                      src={game_img}
-                                      alt={game_name}
-                                      style={{
-                                        width: "100px",
-                                        height: "100px",
-                                        borderRadius: "5px",
-                                        objectFit: "cover",
-                                      }}
-                                    />
-                                  </td>
-                                  <td style={{ width: "30%" }}>
-                                    <Link
-                                      to={`/product/${game_id}`}
-                                      style={{
-                                        textAlign: "center",
-                                        fontSize: "16px",
-                                        color: "#a09e9c",
-                                      }}
+                                  {(provided) => (
+                                    <tr
+                                      style={{ width: "85vw" }}
+                                      {...provided.draggableProps}
+                                      ref={provided.innerRef}
                                     >
-                                      {game_name}
-                                    </Link>
-                                  </td>
-                                  <td
-                                    className="table-desc"
-                                    style={{
-                                      width: "40%",
-                                      textTransform: "none",
-                                    }}
-                                  >
-                                    {game_desc?.length > 250
-                                      ? `${game_desc?.slice(0, 250)}...`
-                                      : game_desc}
-                                  </td>
-                                  <td style={{ width: "5%" }}>
-                                    <button
-                                      onClick={() =>
-                                        handleRemoveFavorite(game_id)
-                                      }
-                                      className="btn btn-danger"
-                                      style={{
-                                        fontSize: "16px",
-                                      }}
-                                    >
-                                      <span
-                                        className="lnr lnr-trash"
-                                        style={{ cursor: "pointer" }}
-                                      ></span>
-                                    </button>
-                                  </td>
-                                </tr>
-                              )}
-                            </Draggable>
-                          );
-                        })}
+                                      <th
+                                        style={{ width: "5%" }}
+                                        {...provided.dragHandleProps}
+                                      >
+                                        <span
+                                          className={`lnr lnr-${
+                                            search.length > 0
+                                              ? "cross-circle"
+                                              : "menu"
+                                          }`}
+                                          style={{
+                                            cursor:
+                                              search.length > 0 && "no-drop",
+                                          }}
+                                          {...provided.dragHandleProps}
+                                        ></span>
+                                      </th>
+                                      <td style={{ width: "5%" }}>
+                                        {index +
+                                          favoritesPerPage * (currentPage - 1) +
+                                          1}
+                                      </td>
+                                      <td style={{ width: "15%" }}>
+                                        <img
+                                          src={game_img}
+                                          alt={game_name}
+                                          style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            borderRadius: "5px",
+                                            objectFit: "cover",
+                                          }}
+                                        />
+                                      </td>
+                                      <td
+                                        className="table-title"
+                                        style={{ width: "30%" }}
+                                      >
+                                        <Link
+                                          to={`/product/${game_id}`}
+                                          style={{
+                                            textAlign: "center",
+                                            fontSize: "16px",
+                                            color: "#a09e9c",
+                                          }}
+                                        >
+                                          {game_name}
+                                        </Link>
+                                      </td>
+                                      <td
+                                        className="table-desc"
+                                        style={{
+                                          width: "40%",
+                                          textTransform: "none",
+                                        }}
+                                      >
+                                        {game_desc?.length > 250
+                                          ? `${game_desc?.slice(0, 250)}...`
+                                          : game_desc}
+                                      </td>
+                                      <td style={{ width: "5%" }}>
+                                        <button
+                                          onClick={() =>
+                                            handleRemoveFavorite(game_id)
+                                          }
+                                          className="btn btn-danger"
+                                          style={{
+                                            fontSize: "16px",
+                                          }}
+                                        >
+                                          <span
+                                            className="lnr lnr-trash"
+                                            style={{ cursor: "pointer" }}
+                                          ></span>
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </Draggable>
+                              );
+                            })
+                        )}
                         {provided.placeholder}
                       </tbody>
                     </table>
@@ -244,16 +290,20 @@ const Favorites = () => {
           </DragDropContext>
           <nav className="pagination-nav">
             <p style={{ textTransform: "none" }}>
-              {`Showing ${indexOfFirstFavorite + 1} to ${
+              {`Showing ${
+                totalFavorites > 0 ? indexOfFirstFavorite + 1 : 0
+              } to ${
                 indexOfLastFavorite > totalFavorites
                   ? totalFavorites
                   : indexOfLastFavorite
               } of ${totalFavorites} entries`}
             </p>
             {favoritesPerPage >= totalFavorites ? null : (
-              <ul className="pagination" style={{ marginTop: "0" }}>
+              <ul className="pagination">
                 {Array.from(
-                  { length: Math.ceil(totalFavorites / favoritesPerPage) },
+                  {
+                    length: Math.ceil(totalFavorites / favoritesPerPage),
+                  },
                   (_, i) => (
                     <li
                       key={i}

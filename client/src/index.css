@@ -123,6 +123,14 @@ a {
   }
 }
 
+/* table title toggle */
+
+@media screen and (max-width: 300px) {
+  .table-title {
+    display: none;
+  }
+}
+
 /* burger menu fix */
 
 .navbar-item {
@@ -251,7 +259,7 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   text-align: center;
 }
 
-/* select */
+/* container data table */
 
 .form-select {
   padding: 2px;
@@ -260,12 +268,25 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   background-color: #fff;
 }
 
+.data-table {
+  display: flex;
+  margin: 0 10px 25px;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* pagination */
 
 .pagination-nav {
   display: flex;
-  margin: 0 10px 10px;
+  margin: 0 10px 30px;
   justify-content: space-between;
+  align-items: center;
+}
+
+.pagination {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .pagination .page-item.active .page-link,
