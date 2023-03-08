@@ -12,9 +12,6 @@ const Home = () => {
   const dispatch = useDispatch();
 
   // all products
-  const allPopularProducts = useSelector(
-    (state) => state.fetchProducts.popularProducts
-  );
   const allLatestProducts = useSelector(
     (state) => state.fetchProducts.latestProducts
   );
@@ -31,7 +28,6 @@ const Home = () => {
     dispatch(fetchProducts());
   }, [fetchProducts]);
 
-  const popularProducts = allPopularProducts.results;
   const latestProducts = allLatestProducts.results;
   const featuredProducts = allFeaturedProducts.results;
   const featuredSingleProductId = allLatestProducts.results?.[0].id;
@@ -89,7 +85,7 @@ const Home = () => {
             data-ride="carousel"
           >
             <ol className="carousel-indicators">
-              {popularProducts?.slice(0, 4).map((item, index) => {
+              {latestProducts?.slice(0, 4).map((item, index) => {
                 const { id } = item;
                 return (
                   <li
@@ -216,76 +212,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* highest rated */}
-        <section id="new-arrivals" className="new-arrivals">
-          <div className="container">
-            <div className="section-header">
-              <h2>highest rated</h2>
-            </div>
-            <div className="new-arrivals-content">
-              <div className="row">
-                {popularProducts?.slice(0, 8).map((product) => {
-                  const { id, name, background_image } = product;
-                  return (
-                    <div key={id} className="col-md-3 col-sm-4">
-                      <div className="single-new-arrival">
-                        <div className="single-new-arrival-bg white-background">
-                          <img
-                            src={background_image}
-                            alt={name}
-                            style={{ height: "250px", objectFit: "cover" }}
-                          />
-                          <div className="single-new-arrival-bg-overlay"></div>
-                          <div className="new-arrival-cart">
-                            <p
-                              style={{
-                                cursor: "pointer",
-                              }}
-                              onClick={() =>
-                                handleAddFavorite({
-                                  id,
-                                })
-                              }
-                            >
-                              <span
-                                className="lnr lnr-heart"
-                                style={{
-                                  paddingRight: "5px",
-                                  cursor: "pointer",
-                                }}
-                              ></span>
-                              add <span>to </span> favorites
-                            </p>
-                            <p className="arrival-review pull-right">
-                              <span className="lnr lnr-frame-expand"></span>
-                            </p>
-                          </div>
-                        </div>
-                        <h4>
-                          <Link
-                            to={`product/${id}`}
-                            style={{
-                              textAlign: "center",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              display: "block",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {name.length > 50
-                              ? `${name.substring(0, 50).trim()}...`
-                              : name}
-                          </Link>
-                        </h4>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* featured product main page */}
         <FeaturedMainPage id={featuredSingleProductId} />
 
@@ -321,10 +247,7 @@ const Home = () => {
                             </span>
                           </p>
                           <h3>
-                            <Link
-                              to={`product/${id}`}
-                              className="popular-product-title"
-                            >
+                            <Link to={`product/${id}`}>
                               {name.length > 50
                                 ? `${name.substring(0, 50).trim()}...`
                                 : name}

@@ -189,7 +189,7 @@ const Navbar = () => {
                     </Link>
                   </li>
                   <li className="nav-item navbar-item">
-                    <Link className="nav-link" to={"/"}>
+                    <Link className="nav-link" to={"/explore"}>
                       explore
                     </Link>
                   </li>
