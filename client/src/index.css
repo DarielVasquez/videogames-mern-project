@@ -679,3 +679,48 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   font-size: 18px;
   text-transform: none;
 }
+
+/* about */
+
+.about-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 50px;
+  margin-top: 20px;
+  background-color: #f8f8f8;
+}
+
+.about-header {
+  font-size: 36px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.about-text {
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 600px;
+  text-align: center;
+  margin-bottom: 40px;
+  text-transform: none;
+}
+
+.about-link {
+  font-size: 16px;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+.about-link:hover {
+  color: #0056b3;
+}
+
+.about-image {
+  width: 300px;
+  height: auto;
+  margin-bottom: 50px;
+}

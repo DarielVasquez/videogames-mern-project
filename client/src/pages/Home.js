@@ -223,7 +223,7 @@ const Home = () => {
             </div>
             <div className="feature-content">
               <div className="row">
-                {featuredProducts?.slice(0, 4).map((product) => {
+                {featuredProducts?.slice(0, 8).map((product) => {
                   const { id, name, background_image, ratings_count } = product;
                   return (
                     <div key={id} className="col-sm-3">
