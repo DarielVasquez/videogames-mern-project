@@ -23,6 +23,14 @@ const Footer = () => {
             </a>
           </div>
           <p>
+            <a
+              href="https://www.flaticon.com/free-icons/game-controller"
+              title="game controller icons"
+            >
+              Game controller icons created by Freepik - Flaticon
+            </a>
+          </p>
+          <p>
             &copy;copyright. overall design by{" "}
             <a href="https://www.themesine.com/">themesine</a>
           </p>
