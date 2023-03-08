@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { fetchExplore } from "../actions";
 import Loading from "../components/Loading";
 import Alerts from "../components/Alerts";
+import { addFavorite } from "../services/favorites";
+import { fetchSingleProduct } from "../actions";
 
 const Explore = () => {
   const dispatch = useDispatch();
@@ -36,23 +38,59 @@ const Explore = () => {
   const actionProducts = allActionProducts.results;
   const indieProducts = allIndieProducts.results;
 
-  console.log(popularProducts);
-  console.log(bestProducts);
-  console.log(actionProducts);
-  console.log(indieProducts);
+  // add to favorites
+
+  const singleProduct = useSelector(
+    (state) => state.fetchSingleProduct.singleProduct
+  );
+  const [clicked, setClicked] = useState(false);
+
+  const handleAddFavorite = async ({ id }) => {
+    setClicked(true);
+    dispatch(fetchSingleProduct(id));
+  };
+
+  useEffect(() => {
+    if (clicked && singleProduct) {
+      const dataGame = {
+        gameId: singleProduct.id,
+        gameName: singleProduct.name,
+        gameImg: singleProduct.background_image,
+        gameDesc: singleProduct.description_raw,
+      };
+      const addFavoriteData = async () => {
+        const request = await addFavorite(dataGame);
+        setAlerts((alerts) => [...alerts, request]);
+      };
+      addFavoriteData();
+    }
+  }, [singleProduct]);
+
+  // alert message
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (alerts.length > 0) {
+        //remove the first message after 2s
+        setAlerts(alerts.slice(1));
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [alerts]);
 
   if (isLoading) {
     return <Loading />;
   } else
     return (
       <main>
+        <Alerts alerts={alerts} setAlerts={setAlerts} />
         <h1>Explore Video Games</h1>
         <p>Discover and play new games</p>
-        {/* highest rated */}
+        {/* popular picks */}
         <section id="new-arrivals" className="new-arrivals">
           <div className="container">
             <div className="section-header">
-              <h2>highest rated</h2>
+              <h2>Popular Picks</h2>
             </div>
             <div className="new-arrivals-content">
               <div className="row">
@@ -73,11 +111,11 @@ const Explore = () => {
                               style={{
                                 cursor: "pointer",
                               }}
-                              // onClick={() =>
-                              //   handleAddFavorite({
-                              //     id,
-                              //   })
-                              // }
+                              onClick={() =>
+                                handleAddFavorite({
+                                  id,
+                                })
+                              }
                             >
                               <span
                                 className="lnr lnr-heart"
@@ -95,7 +133,7 @@ const Explore = () => {
                         </div>
                         <h4>
                           <Link
-                            to={`product/${id}`}
+                            to={`/product/${id}`}
                             style={{
                               textAlign: "center",
                               whiteSpace: "nowrap",
@@ -117,11 +155,11 @@ const Explore = () => {
             </div>
           </div>
         </section>
-        {/* best of all time */}
+        {/* popular RPGs */}
         <section id="new-arrivals" className="new-arrivals">
           <div className="container">
             <div className="section-header">
-              <h2>best of all time</h2>
+              <h2>popular RPGs</h2>
             </div>
             <div className="new-arrivals-content">
               <div className="row">
@@ -142,11 +180,11 @@ const Explore = () => {
                               style={{
                                 cursor: "pointer",
                               }}
-                              // onClick={() =>
-                              //   handleAddFavorite({
-                              //     id,
-                              //   })
-                              // }
+                              onClick={() =>
+                                handleAddFavorite({
+                                  id,
+                                })
+                              }
                             >
                               <span
                                 className="lnr lnr-heart"
@@ -164,7 +202,7 @@ const Explore = () => {
                         </div>
                         <h4>
                           <Link
-                            to={`product/${id}`}
+                            to={`/product/${id}`}
                             style={{
                               textAlign: "center",
                               whiteSpace: "nowrap",
@@ -186,11 +224,11 @@ const Explore = () => {
             </div>
           </div>
         </section>
-        {/* shooters */}
+        {/* popular nintendo games */}
         <section id="new-arrivals" className="new-arrivals">
           <div className="container">
             <div className="section-header">
-              <h2>shooters</h2>
+              <h2>popular nintendo games</h2>
             </div>
             <div className="new-arrivals-content">
               <div className="row">
@@ -211,11 +249,11 @@ const Explore = () => {
                               style={{
                                 cursor: "pointer",
                               }}
-                              // onClick={() =>
-                              //   handleAddFavorite({
-                              //     id,
-                              //   })
-                              // }
+                              onClick={() =>
+                                handleAddFavorite({
+                                  id,
+                                })
+                              }
                             >
                               <span
                                 className="lnr lnr-heart"
@@ -233,7 +271,7 @@ const Explore = () => {
                         </div>
                         <h4>
                           <Link
-                            to={`product/${id}`}
+                            to={`/product/${id}`}
                             style={{
                               textAlign: "center",
                               whiteSpace: "nowrap",
@@ -255,11 +293,11 @@ const Explore = () => {
             </div>
           </div>
         </section>
-        {/* indies */}
+        {/* popular indies */}
         <section id="new-arrivals" className="new-arrivals">
           <div className="container">
             <div className="section-header">
-              <h2>indies</h2>
+              <h2>popular indies</h2>
             </div>
             <div className="new-arrivals-content">
               <div className="row">
@@ -280,11 +318,11 @@ const Explore = () => {
                               style={{
                                 cursor: "pointer",
                               }}
-                              // onClick={() =>
-                              //   handleAddFavorite({
-                              //     id,
-                              //   })
-                              // }
+                              onClick={() =>
+                                handleAddFavorite({
+                                  id,
+                                })
+                              }
                             >
                               <span
                                 className="lnr lnr-heart"
@@ -302,7 +340,7 @@ const Explore = () => {
                         </div>
                         <h4>
                           <Link
-                            to={`product/${id}`}
+                            to={`/product/${id}`}
                             style={{
                               textAlign: "center",
                               whiteSpace: "nowrap",
