@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { deleteFavorite, getFavorites } from "../services/favorites";
-import { useSelector } from "react-redux";
 import Loading from "../components/Loading";
+import Alerts from "../components/Alerts";
 import { isUserLogged } from "../services/login";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { updateFavorites } from "../services/favorites";
@@ -17,12 +17,19 @@ const Favorites = () => {
   // search query
   const [search, setSearch] = useState("");
   const [filteredFavorites, setFilteredFavorites] = useState([]);
+  // alerts
+  const [alerts, setAlerts] = useState([]);
 
   // remove favorite
 
   const handleRemoveFavorite = async (game_id) => {
-    const removeFavorite = await deleteFavorite(game_id);
+    const request = await deleteFavorite(game_id);
     fetchFavorites();
+    setSearch("");
+    if (indexOfFirstFavorite + 1 === totalFavorites) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+    setAlerts((alerts) => [...alerts, request]);
   };
 
   // fetch favorites
@@ -33,6 +40,8 @@ const Favorites = () => {
     setFilteredFavorites(favoritesData.favorites);
     setIsLoading(false);
   };
+
+  // verify user
 
   const verifyUser = async () => {
     const user = await isUserLogged();
@@ -84,21 +93,30 @@ const Favorites = () => {
     setCurrentPage(1);
   };
 
+  // alert message
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (alerts.length > 0) {
+        setAlerts(alerts.slice(1));
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [alerts]);
+
+  const totalSearch = search.length;
+
   if (isLoading) {
     return <Loading />;
   }
   return (
     <main className="container">
-      <h2
-        className="title"
-        style={{
-          marginTop: "140px",
-        }}
-      >
+      <h2 className="title" style={{ marginTop: "140px" }}>
         Favorites
       </h2>
+      <Alerts alerts={alerts} setAlerts={setAlerts} />
       {favorites?.length === 0 ? (
-        <div style={{ textAlign: "center" }}>no favorites added</div>
+        <div className="center-text">no favorites added</div>
       ) : (
         <>
           <div className="data-table">
@@ -140,22 +158,13 @@ const Favorites = () => {
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                   >
-                    <table
-                      className="table table-striped table-bordered table-hover"
-                      style={{
-                        backgroundColor: "rgb(248, 249, 252)",
-                        width: "100%",
-                        textAlign: "center",
-                      }}
-                    >
+                    <table className="table table-striped table-bordered table-hover">
                       <thead>
-                        <tr
-                          style={{
-                            backgroundColor: "#e99c2e",
-                            color: "white",
-                          }}
-                        >
-                          <th scope="col"></th>
+                        <tr className="tr">
+                          <th
+                            scope="col"
+                            style={{ display: totalSearch > 0 && "none" }}
+                          ></th>
                           <th scope="col">#</th>
                           <th scope="col">Image</th>
                           <th scope="col" className="table-title">
@@ -187,7 +196,7 @@ const Favorites = () => {
                                 <Draggable
                                   key={game_id}
                                   draggableId={game_id.toString()}
-                                  isDragDisabled={search.length > 0}
+                                  isDragDisabled={totalSearch > 0}
                                   index={
                                     index + favoritesPerPage * (currentPage - 1)
                                   }
@@ -199,18 +208,17 @@ const Favorites = () => {
                                       ref={provided.innerRef}
                                     >
                                       <th
-                                        style={{ width: "5%" }}
+                                        style={{
+                                          width: "5%",
+                                          display: totalSearch > 0 && "none",
+                                        }}
                                         {...provided.dragHandleProps}
                                       >
                                         <span
-                                          className={`lnr lnr-${
-                                            search.length > 0
-                                              ? "cross-circle"
-                                              : "menu"
-                                          }`}
+                                          className={`lnr lnr-menu`}
                                           style={{
                                             cursor:
-                                              search.length > 0 && "no-drop",
+                                              totalSearch > 0 && "no-drop",
                                           }}
                                           {...provided.dragHandleProps}
                                         ></span>
@@ -224,36 +232,18 @@ const Favorites = () => {
                                         <img
                                           src={game_img}
                                           alt={game_name}
-                                          style={{
-                                            width: "100px",
-                                            height: "100px",
-                                            borderRadius: "5px",
-                                            objectFit: "cover",
-                                          }}
+                                          className="img-table"
                                         />
                                       </td>
-                                      <td
-                                        className="table-title"
-                                        style={{ width: "30%" }}
-                                      >
+                                      <td className="table-title">
                                         <Link
                                           to={`/product/${game_id}`}
-                                          style={{
-                                            textAlign: "center",
-                                            fontSize: "16px",
-                                            color: "#a09e9c",
-                                          }}
+                                          className="title-link"
                                         >
                                           {game_name}
                                         </Link>
                                       </td>
-                                      <td
-                                        className="table-desc"
-                                        style={{
-                                          width: "40%",
-                                          textTransform: "none",
-                                        }}
-                                      >
+                                      <td className="table-desc">
                                         {game_desc?.length > 250
                                           ? `${game_desc?.slice(0, 250)}...`
                                           : game_desc}
@@ -264,9 +254,7 @@ const Favorites = () => {
                                             handleRemoveFavorite(game_id)
                                           }
                                           className="btn btn-danger"
-                                          style={{
-                                            fontSize: "16px",
-                                          }}
+                                          style={{ fontSize: "16px" }}
                                         >
                                           <span
                                             className="lnr lnr-trash"
@@ -296,7 +284,7 @@ const Favorites = () => {
                 indexOfLastFavorite > totalFavorites
                   ? totalFavorites
                   : indexOfLastFavorite
-              } of ${totalFavorites} entries`}
+              } of ${favorites.length} entries`}
             </p>
             {favoritesPerPage >= totalFavorites ? null : (
               <ul className="pagination">

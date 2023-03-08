@@ -62,31 +62,12 @@ const Login = () => {
 
   return (
     <main>
-      <div
-        style={{
-          position: "relative",
-          marginTop: "130px",
-          marginBottom: "50px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "50px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <h1 style={{ textAlign: "center", marginBottom: "20px" }}>LOGIN</h1>
+      <div className="card">
+        <div className="card-container">
+          <h1 className="card-title">LOGIN</h1>
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="username"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
+            <div className="card-margin">
+              <label htmlFor="username" className="card-label">
                 Username:
               </label>
               <input
@@ -101,14 +82,11 @@ const Login = () => {
                 <div className="invalid-feedback">{errors.username}</div>
               )}
             </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="password"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
+            <div className="card-margin">
+              <label htmlFor="password" className="card-label">
                 Password:
               </label>
-              <div style={{ display: "flex", flexDirection: "row" }}>
+              <div className="card-pswd-input">
                 <input
                   className={`input-form ${
                     errors.password ? "is-invalid" : ""
@@ -127,32 +105,17 @@ const Login = () => {
                   className="show-password"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  <span
-                    className="lnr lnr-eye"
-                    style={{ cursor: "pointer" }}
-                  ></span>
+                  <span className="lnr lnr-eye"></span>
                 </div>
               </div>
               {errors.password && (
                 <div className="invalid-feedback">{errors.password}</div>
               )}
             </div>
-            <button
-              type="submit"
-              style={{
-                marginBottom: "20px",
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                backgroundColor: "#e99c2e",
-                color: "#fff",
-                border: "none",
-              }}
-            >
+            <button type="submit" className="submit-button">
               Login
             </button>
-            <div style={{ textAlign: "center" }}>
+            <div className="center-text">
               <Link to={"/signup"} style={{ textTransform: "none" }}>
                 Create an Account
               </Link>

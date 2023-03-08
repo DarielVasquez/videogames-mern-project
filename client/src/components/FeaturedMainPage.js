@@ -41,7 +41,7 @@ const FeaturedMainPage = ({ id }) => {
             <div className="container">
               <div className="sofa-collection-txt">
                 <h2>{mainProduct.name}</h2>
-                <p>
+                <p style={{ textTransform: "none" }}>
                   {mainProduct.description_raw?.length > 300
                     ? `${mainProduct.description_raw
                         ?.substring(0, 300)
@@ -49,9 +49,8 @@ const FeaturedMainPage = ({ id }) => {
                     : mainProduct.description_raw}
                 </p>
                 <Link
-                  className="btn-cart welcome-add-cart sofa-collection-btn"
+                  className="btn-cart welcome-add-cart sofa-collection-btn text-center"
                   to={`product/${id}`}
-                  style={{ textAlign: "center" }}
                 >
                   view more
                 </Link>

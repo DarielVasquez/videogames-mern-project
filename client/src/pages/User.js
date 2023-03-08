@@ -5,6 +5,7 @@ import { getUserById, updateUser, removeUser } from "../services/user";
 import { loginUser } from "../services/login";
 import { logoutUser } from "../services/logout";
 import { logoutUserAction } from "../actions";
+import Alerts from "../components/Alerts";
 
 const User = () => {
   const dispatch = useDispatch();
@@ -18,12 +19,19 @@ const User = () => {
     newPassword: "",
   });
   const [errors, setErrors] = useState({});
+  // change password
   const [changePassword, setChangePassword] = useState(false);
+  // show passwords in input field
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // delete user modal
   const [showModal, setShowModal] = useState(false);
   const [removeUserPassword, setRemoveUserPassword] = useState("");
   const [showRemovePassword, setShowRemovePassword] = useState(false);
+  // alerts
+  const [alerts, setAlerts] = useState([]);
+
+  // verify user
 
   const verifyUser = async () => {
     const user = await getUserById();
@@ -35,6 +43,8 @@ const User = () => {
     verifyUser();
   }, []);
 
+  // inputs form
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData({
@@ -43,18 +53,14 @@ const User = () => {
     });
   };
 
-  const handleShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
-  const handleChangePassword = () => {
-    setChangePassword(!changePassword);
-  };
+  // edit user button
 
   const handleEditClick = () => {
     setIsEditing(true);
     setFormData({ ...formData, password: "", newPassword: "" });
   };
+
+  // delete user button
 
   const handleDeleteClick = async () => {
     const confirmPassword = removeUserPassword;
@@ -73,6 +79,8 @@ const User = () => {
       }
     }
   };
+
+  // save changes button
 
   const handleSaveClick = async () => {
     const newErrors = validateFormData(formData);
@@ -104,17 +112,22 @@ const User = () => {
         setFormData({ ...formData, password: "", newPassword: "" });
         setErrors({});
         setIsEditing(!isEditing);
+        setAlerts((alerts) => [...alerts, data]);
       }
     } else {
       setErrors(newErrors);
     }
   };
 
+  // cancel edit button
+
   const handleCancelClick = () => {
     verifyUser();
     setIsEditing(!isEditing);
     setErrors({});
   };
+
+  // validate form
 
   const validateFormData = (data) => {
     const errors = {};
@@ -142,33 +155,27 @@ const User = () => {
     return errors;
   };
 
+  // alert message
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (alerts.length > 0) {
+        setAlerts(alerts.slice(1));
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [alerts]);
+
   return (
     <main>
-      <div
-        style={{
-          position: "relative",
-          marginTop: "130px",
-          marginBottom: "50px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "50px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-            <h1 style={{ textAlign: "center", padding: "20px" }}>
-              User Profile
-            </h1>
+      <Alerts alerts={alerts} setAlerts={setAlerts} />
+      <div className="card">
+        <div className="card-container">
+          <div className="user-card">
+            <h1 className="user-card-title">User Profile</h1>
             {
               <>
-                <div style={{ marginBottom: "20px" }}>
+                <div className="card-margin">
                   <label htmlFor="name">Name</label>
                   <input
                     type="text"
@@ -185,7 +192,7 @@ const User = () => {
                     <div className="invalid-feedback">{errors.name}</div>
                   )}
                 </div>
-                <div style={{ marginBottom: "20px" }}>
+                <div className="card-margin">
                   <label htmlFor="username">Username</label>
                   <input
                     type="text"
@@ -204,7 +211,7 @@ const User = () => {
                     <div className="invalid-feedback">{errors.username}</div>
                   )}
                 </div>
-                <div style={{ marginBottom: "20px" }}>
+                <div className="card-margin">
                   <label htmlFor="email">Email address</label>
                   <input
                     type="email"
@@ -223,11 +230,11 @@ const User = () => {
                 </div>
                 {isEditing && (
                   <>
-                    <div style={{ marginBottom: "20px" }}>
+                    <div className="card-margin">
                       <label htmlFor="password">
                         {changePassword ? `Old Password` : `Confirm Password:`}
                       </label>
-                      <div style={{ display: "flex", flexDirection: "row" }}>
+                      <div className="card-pswd-input">
                         <input
                           type={showPassword ? "text" : "password"}
                           className={`input-form ${
@@ -249,10 +256,7 @@ const User = () => {
                           className="show-password"
                           onClick={() => setShowPassword(!showPassword)}
                         >
-                          <span
-                            className="lnr lnr-eye"
-                            style={{ cursor: "pointer" }}
-                          ></span>
+                          <span className="lnr lnr-eye"></span>
                         </div>
                       </div>
                       {errors.password && (
@@ -263,11 +267,9 @@ const User = () => {
                     </div>
                     {changePassword && (
                       <>
-                        <div style={{ marginBottom: "20px" }}>
+                        <div className="card-margin">
                           <label htmlFor="password">New Password</label>
-                          <div
-                            style={{ display: "flex", flexDirection: "row" }}
-                          >
+                          <div className="card-pswd-input">
                             <input
                               type={showConfirmPassword ? "text" : "password"}
                               className={`input-form ${
@@ -291,10 +293,7 @@ const User = () => {
                                 setShowConfirmPassword(!showConfirmPassword)
                               }
                             >
-                              <span
-                                className="lnr lnr-eye"
-                                style={{ cursor: "pointer" }}
-                              ></span>
+                              <span className="lnr lnr-eye"></span>
                             </div>
                           </div>
                           {errors.newPassword && (
@@ -306,14 +305,8 @@ const User = () => {
                       </>
                     )}
                     <div
-                      onClick={handleChangePassword}
-                      className="btn btn-warning"
-                      style={{
-                        textAlign: "center",
-                        margin: "10px 0 15px 0",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
+                      onClick={() => setChangePassword(!changePassword)}
+                      className="btn btn-warning user-change-pswd-button"
                     >
                       {!changePassword ? "Change Password" : "Cancel Change"}
                     </div>
@@ -321,34 +314,15 @@ const User = () => {
                 )}
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <div
-                    className="btn btn-primary mr-2"
-                    style={{
-                      marginBottom: "20px",
-                      display: "block",
-                      width: "100%",
-                      padding: "10px",
-                      borderRadius: "5px",
-                      color: "#fff",
-                      border: "none",
-                      margin: "10px",
-                      marginLeft: "0px",
-                    }}
+                    className="btn btn-primary mr-2 user-btn-primary"
                     onClick={isEditing ? handleSaveClick : handleEditClick}
                   >
                     {isEditing ? "Save" : "Edit"}
                   </div>
                   <div
-                    className={`btn btn-${isEditing ? "secondary" : "danger"} `}
-                    style={{
-                      marginBottom: "20px",
-                      display: "block",
-                      width: "100%",
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                      margin: "10px",
-                      marginRight: "0px",
-                    }}
+                    className={`btn btn-${
+                      isEditing ? "secondary" : "danger"
+                    } user-btn-secondary`}
                     onClick={() =>
                       isEditing ? handleCancelClick() : setShowModal(!showModal)
                     }
@@ -382,9 +356,7 @@ const User = () => {
             </div>
             <div className="modal-body">
               Confirm password:
-              <div
-                style={{ display: "flex", flexDirection: "row", margin: "5px" }}
-              >
+              <div className="modal-body-input">
                 <input
                   type={showRemovePassword ? "text" : "password"}
                   className={`input-form ${
@@ -403,10 +375,7 @@ const User = () => {
                   className="show-password"
                   onClick={() => setShowRemovePassword(!showRemovePassword)}
                 >
-                  <span
-                    className="lnr lnr-eye"
-                    style={{ cursor: "pointer" }}
-                  ></span>
+                  <span className="lnr lnr-eye"></span>
                 </div>
               </div>
               {errors.password && (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addUser } from "../services/user";
 import { loginUser } from "../services/login";
 import { loginUserAction } from "../actions";
@@ -17,8 +17,11 @@ const SignUp = () => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
+  // show passwords inputs
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // verify whether user is logged in or not
 
   const verifyUser = async () => {
     const user = await isUserLogged();
@@ -30,6 +33,8 @@ const SignUp = () => {
   useEffect(() => {
     verifyUser();
   }, []);
+
+  // handle input changes
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -46,6 +51,8 @@ const SignUp = () => {
   const handleShowConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
+
+  // submit data
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,11 +82,12 @@ const SignUp = () => {
           navigate("/");
         }
       }
-      if (signupData.status === "success") console.log("Form data submitted!");
     } else {
       setErrors(newErrors);
     }
   };
+
+  // validate data
 
   const validateFormData = (data) => {
     const errors = {};
@@ -107,31 +115,12 @@ const SignUp = () => {
 
   return (
     <main>
-      <div
-        style={{
-          position: "relative",
-          marginTop: "130px",
-          marginBottom: "50px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "50px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <h1 style={{ textAlign: "center", marginBottom: "20px" }}>SIGN-UP</h1>
+      <div className="card">
+        <div className="card-container">
+          <h1 className="card-title">SIGN-UP</h1>
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="name"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
+            <div className="card-margin">
+              <label htmlFor="name" className="card-label">
                 Name:
               </label>
               <input
@@ -146,11 +135,8 @@ const SignUp = () => {
                 <div className="invalid-feedback">{errors.name}</div>
               )}
             </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="username"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
+            <div className="card-margin">
+              <label htmlFor="username" className="card-label">
                 Username:
               </label>
               <input
@@ -165,11 +151,8 @@ const SignUp = () => {
                 <div className="invalid-feedback">{errors.username}</div>
               )}
             </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="email"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
+            <div className="card-margin">
+              <label htmlFor="email" className="card-label">
                 Email:
               </label>
               <input
@@ -184,14 +167,11 @@ const SignUp = () => {
                 <div className="invalid-feedback">{errors.email}</div>
               )}
             </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="password"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
+            <div className="card-margin">
+              <label htmlFor="password" className="card-label">
                 Password:
               </label>
-              <div style={{ display: "flex", flexDirection: "row" }}>
+              <div className="card-pswd-input">
                 <input
                   className={`input-form ${
                     errors.password ? "is-invalid" : ""
@@ -207,24 +187,18 @@ const SignUp = () => {
                   }}
                 />
                 <div className="show-password" onClick={handleShowPassword}>
-                  <span
-                    className="lnr lnr-eye"
-                    style={{ cursor: "pointer" }}
-                  ></span>
+                  <span className="lnr lnr-eye"></span>
                 </div>
               </div>
               {errors.password && (
                 <div className="invalid-feedback">{errors.password}</div>
               )}
             </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="password"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
+            <div className="card-margin">
+              <label htmlFor="password" className="card-label">
                 Confirm password:
               </label>
-              <div style={{ display: "flex", flexDirection: "row" }}>
+              <div className="card-pswd-input">
                 <input
                   className={`input-form ${
                     errors.confirmPassword ? "is-invalid" : ""
@@ -243,32 +217,17 @@ const SignUp = () => {
                   className="show-password"
                   onClick={handleShowConfirmPassword}
                 >
-                  <span
-                    className="lnr lnr-eye"
-                    style={{ cursor: "pointer" }}
-                  ></span>
+                  <span className="lnr lnr-eye"></span>
                 </div>
               </div>
               {errors.confirmPassword && (
                 <div className="invalid-feedback">{errors.confirmPassword}</div>
               )}
             </div>
-            <button
-              type="submit"
-              style={{
-                marginBottom: "20px",
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                backgroundColor: "#e99c2e",
-                color: "#fff",
-                border: "none",
-              }}
-            >
+            <button type="submit" className="submit-button">
               Sign-Up
             </button>
-            <div style={{ textAlign: "center" }}>
+            <div className="center-text">
               <Link to={"/login"} style={{ textTransform: "none" }}>
                 Already have an Account?
               </Link>

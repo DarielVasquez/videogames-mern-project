@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleProduct } from "../actions";
 import NoProduct from "./NoProduct";
 import Loading from "../components/Loading";
+import Alerts from "../components/Alerts";
 import { addFavorite } from "../services/favorites";
 
 const SingleProduct = () => {
@@ -14,7 +15,8 @@ const SingleProduct = () => {
   );
   const isLoading = useSelector((state) => state.fetchSingleProduct.isLoading);
   const error = useSelector((state) => state.fetchSingleProduct.error);
-  // console.log(singleProduct);
+  // alerts
+  const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
     if (id) dispatch(fetchSingleProduct(id));
@@ -28,7 +30,19 @@ const SingleProduct = () => {
       gameDesc: description,
     };
     const request = await addFavorite(data);
+    setAlerts((alerts) => [...alerts, request]);
   };
+
+  // alert message
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (alerts.length > 0) {
+        setAlerts(alerts.slice(1));
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [alerts]);
 
   const {
     name,
@@ -50,83 +64,25 @@ const SingleProduct = () => {
     return <NoProduct />;
   } else
     return (
-      <main style={{ marginTop: "150px", marginBottom: "30px" }}>
-        {/* <a
-            // href={game.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              textDecoration: "none",
-              color: "#007bff",
-              fontWeight: "bold",
-              marginBottom: "30px",
-            }}
-          >
-            Visit Website
-          </a> */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "800px",
-              width: "100%",
-              padding: "30px",
-              backgroundColor: "#fff",
-              borderRadius: "10px",
-              boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "4rem",
-                fontWeight: "bold",
-                marginBottom: "20px",
-                textAlign: "center",
-              }}
-            >
-              {name}
-            </h2>
-            <img
-              style={{
-                display: "block",
-                width: "100%",
-                minHeight: "400px",
-                marginBottom: "20px",
-                objectFit: "cover",
-              }}
-              src={image}
-              alt={name}
-            />
-            <p
-              style={{
-                maxWidth: "800px",
-                width: "100%",
-                marginBottom: "20px",
-                textTransform: "none",
-              }}
-            >
-              {description}
-            </p>
-            <p
-              style={{
-                marginBottom: "20px",
-              }}
-            >
+      <main className="single-product-container">
+        <Alerts alerts={alerts} setAlerts={setAlerts} />
+        <div className="single-product-center">
+          <div className="single-product-size">
+            <h2 className="single-product-title">{name}</h2>
+            <img className="single-product-image" src={image} alt={name} />
+            <p className="single-product-desc">{description}</p>
+            <p className="margin-bottom">
               <strong>Release Date:</strong> {released}
             </p>
-            <ul style={{ marginBottom: "20px" }}>
-              <p style={{ fontWeight: "bold" }}>Genres:</p>
+            <ul className="margin-bottom">
+              <p className="font-bold">Genres:</p>
               {genres?.map((item) => {
                 const { id, name } = item;
                 return <li key={id}> - {name}</li>;
               })}
             </ul>
-            <ul style={{ marginBottom: "20px" }}>
-              <p style={{ fontWeight: "bold" }}>Platforms:</p>
+            <ul className="margin-bottom">
+              <p className="font-bold">Platforms:</p>
               {platforms?.map((item) => {
                 const {
                   platform: { id, name },
@@ -134,8 +90,8 @@ const SingleProduct = () => {
                 return <li key={id}> - {name}</li>;
               })}
             </ul>
-            <div style={{ marginBottom: "20px" }}>
-              <p style={{ fontWeight: "bold" }}>Tags:</p>
+            <div className="margin-bottom">
+              <p className="font-bold">Tags:</p>
               {tags?.map((item, index) => {
                 const { id, name, language } = item;
                 return (
@@ -151,8 +107,7 @@ const SingleProduct = () => {
             </p>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <button
-                className="btn-cart welcome-add-cart"
-                style={{ textAlign: "center" }}
+                className="btn-cart welcome-add-cart center-text add-favorites-btn"
                 onClick={() =>
                   handleAddFavorite({
                     id,

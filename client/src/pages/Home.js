@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import { fetchProducts } from "../actions";
 import FeaturedMainPage from "../components/FeaturedMainPage";
 import Loading from "../components/Loading";
+import Alerts from "../components/Alerts";
 import { addFavorite } from "../services/favorites";
 import { fetchSingleProduct } from "../actions";
 
 const Home = () => {
   const dispatch = useDispatch();
 
-  //all products
+  // all products
   const allPopularProducts = useSelector(
     (state) => state.fetchProducts.popularProducts
   );
@@ -21,7 +22,10 @@ const Home = () => {
     (state) => state.fetchProducts.featuredProducts
   );
   const isLoading = useSelector((state) => state.fetchProducts.isLoading);
-  const error = useSelector((state) => state.fetchProducts.error);
+  // alerts
+  const [alerts, setAlerts] = useState([]);
+
+  // fetch data
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -32,11 +36,8 @@ const Home = () => {
   const featuredProducts = allFeaturedProducts.results;
   const featuredSingleProductId = allLatestProducts.results?.[0].id;
 
-  // console.log(popularProducts);
-  // console.log(latestProducts);
-  // console.log(featuredProducts);
+  // add to favorites
 
-  //add to favorites
   const singleProduct = useSelector(
     (state) => state.fetchSingleProduct.singleProduct
   );
@@ -55,24 +56,33 @@ const Home = () => {
         gameImg: singleProduct.background_image,
         gameDesc: singleProduct.description_raw,
       };
-      // console.log(dataGame);
       const addFavoriteData = async () => {
         const request = await addFavorite(dataGame);
+        setAlerts((alerts) => [...alerts, request]);
       };
       addFavoriteData();
     }
   }, [singleProduct]);
+
+  // alert message
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (alerts.length > 0) {
+        //remove the first message after 2s
+        setAlerts(alerts.slice(1));
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [alerts]);
 
   if (isLoading) {
     return <Loading />;
   } else
     return (
       <main>
-        <header
-          id="home"
-          className="welcome-hero"
-          style={{ background: "white" }}
-        >
+        <Alerts alerts={alerts} setAlerts={setAlerts} />
+        <header id="home" className="welcome-hero white-background">
           <div
             id="header-carousel"
             className="carousel slide carousel-fade"
@@ -130,8 +140,7 @@ const Home = () => {
                                     </ul>
                                   </div>
                                   <button
-                                    className="btn-cart welcome-add-cart"
-                                    style={{ textAlign: "center" }}
+                                    className="btn-cart welcome-add-cart center-text"
                                     onClick={() =>
                                       handleAddFavorite({
                                         id,
@@ -142,9 +151,8 @@ const Home = () => {
                                     add <span>to</span> favorites
                                   </button>
                                   <Link
-                                    className="btn-cart welcome-add-cart welcome-more-info"
+                                    className="btn-cart welcome-add-cart welcome-more-info center-text"
                                     to={`product/${id}`}
-                                    style={{ textAlign: "center" }}
                                   >
                                     More info
                                   </Link>
@@ -157,10 +165,7 @@ const Home = () => {
                                   <img
                                     src={background_image}
                                     alt={name}
-                                    style={{
-                                      objectFit: "cover",
-                                      height: "300px",
-                                    }}
+                                    className="home-image"
                                   />
                                 </div>
                               </div>
@@ -177,11 +182,7 @@ const Home = () => {
         </header>
 
         {/* popular products */}
-        <section
-          id="populer-products"
-          className="populer-products"
-          style={{ background: "#f8f9fc", padding: "50px 0" }}
-        >
+        <section id="populer-products" className="populer-products">
           <div className="container">
             <div className="populer-products-content">
               <div className="row">
@@ -190,99 +191,26 @@ const Home = () => {
                     product;
                   return (
                     <div key={id} className="col-md-3">
-                      <div
-                        className="single-populer-products"
-                        style={{
-                          background: "white",
-                          padding: "10px 10px 15px 10px",
-                        }}
-                      >
-                        <div
-                          className="single-populer-product-img mt20"
-                          style={{ height: "200px", position: "relative" }}
-                        >
+                      <div className="single-populer-products">
+                        <div className="single-populer-product-img mt20">
                           <img
                             src={background_image}
                             alt={name}
-                            style={{
-                              height: "200px",
-                              position: "absolute",
-                              top: "50%",
-                              left: "50%",
-                              transform: "translate(-50%, -50%)",
-                              objectFit: "cover",
-                            }}
+                            className="popular-product-img"
                           />
                         </div>
                         <h2>
                           <Link
                             to={`product/${id}`}
-                            style={{
-                              textAlign: "center",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              display: "block",
-                              textOverflow: "ellipsis",
-                            }}
+                            className="popular-product-title"
                           >
                             {name}
                           </Link>
                         </h2>
-                        <div className="single-populer-products-para">
-                          <p>
-                            Lorem ipsum dolor, sit amet consectetur adipisicing
-                            elit. In velit possimus nesciunt suscipit nostrum
-                            vitae eveniet architecto atque vero perspiciatis,
-                            tenetur beatae nulla quas praesentium, minima
-                            debitis facere et hic.
-                            {/* {description.length > 50 ? `${description.substring(0,50).trim()}...` : description} */}
-                          </p>
-                        </div>
                       </div>
                     </div>
                   );
                 })}
-                {/* <div className="col-md-6">
-                <div className="single-populer-products">
-                  <div className="single-inner-populer-products">
-                    <div className="row">
-                      <div className="col-md-4 col-sm-12">
-                        <div className="single-inner-populer-product-img">
-                          <img
-                            src="assets/images/populer-products/p2.png"
-                            alt="populer-products images"
-                          />
-                        </div>
-                      </div>
-                      <div className="col-md-8 col-sm-12">
-                        <div className="single-inner-populer-product-txt">
-                          <h2>
-                            <a href="#">
-                              latest designed stool <span>and</span> chair
-                            </a>
-                          </h2>
-                          <p>
-                            Edi ut perspiciatis unde omnis iste natusina error
-                            sit voluptatem accusantium doloret mque laudantium,
-                            totam rem aperiam.
-                          </p>
-                          <div className="populer-products-price">
-                            <h4>
-                              Sales Start from <span>$99.00</span>
-                            </h4>
-                          </div>
-                          <button
-                            className="btn-cart welcome-add-cart populer-products-btn"
-                            // onClick="window.location.href='#'"
-                          >
-                            discover more
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div> */}
               </div>
             </div>
           </div>
@@ -301,10 +229,7 @@ const Home = () => {
                   return (
                     <div key={id} className="col-md-3 col-sm-4">
                       <div className="single-new-arrival">
-                        <div
-                          className="single-new-arrival-bg"
-                          style={{ background: "white" }}
-                        >
+                        <div className="single-new-arrival-bg white-background">
                           <img
                             src={background_image}
                             alt={name}
@@ -365,11 +290,7 @@ const Home = () => {
         <FeaturedMainPage id={featuredSingleProductId} />
 
         {/* featured products */}
-        <section
-          id="feature"
-          className="feature"
-          style={{ background: "#f8f9fc" }}
-        >
+        <section id="feature" className="feature white-background">
           <div className="container">
             <div className="section-header">
               <h2>featured products</h2>
@@ -384,7 +305,7 @@ const Home = () => {
                         <img
                           src={background_image}
                           alt={name}
-                          style={{ height: "250px", objectFit: "cover" }}
+                          className="single-product-img"
                         />
                         <div className="single-feature-txt text-center">
                           <p>
@@ -402,13 +323,7 @@ const Home = () => {
                           <h3>
                             <Link
                               to={`product/${id}`}
-                              style={{
-                                textAlign: "center",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                display: "block",
-                                textOverflow: "ellipsis",
-                              }}
+                              className="popular-product-title"
                             >
                               {name.length > 50
                                 ? `${name.substring(0, 50).trim()}...`
@@ -456,90 +371,6 @@ const Home = () => {
           </div>
         </div>
       </section> */}
-
-        <section id="newsletter" className="newsletter">
-          <div className="container">
-            <div className="hm-footer-details">
-              <div className="row">
-                <div className=" col-md-4 col-sm-4 col-xs-6">
-                  <div className="hm-footer-widget">
-                    <div className="hm-foot-title">
-                      <h4>information</h4>
-                    </div>
-                    <div className="hm-foot-menu">
-                      <ul>
-                        <li>
-                          <a href="#">about us</a>
-                        </li>
-                        <li>
-                          <a href="#">contact us</a>
-                        </li>
-                        <li>
-                          <a href="#">news</a>
-                        </li>
-                        <li>
-                          <a href="#">store</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div className=" col-md-4 col-sm-4 col-xs-6">
-                  <div className="hm-footer-widget">
-                    <div className="hm-foot-title">
-                      <h4>collections</h4>
-                    </div>
-                    <div className="hm-foot-menu">
-                      <ul>
-                        <li>
-                          <a href="#">wooden chair</a>
-                        </li>
-                        <li>
-                          <a href="#">royal cloth sofa</a>
-                        </li>
-                        <li>
-                          <a href="#">accent chair</a>
-                        </li>
-                        <li>
-                          <a href="#">bed</a>
-                        </li>
-                        <li>
-                          <a href="#">hanging lamp</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div className=" col-md-4 col-sm-4 col-xs-6">
-                  <div className="hm-footer-widget">
-                    <div className="hm-foot-title">
-                      <h4>my accounts</h4>
-                    </div>
-                    <div className="hm-foot-menu">
-                      <ul>
-                        <li>
-                          <a href="#">my account</a>
-                        </li>
-                        <li>
-                          <a href="#">favorites</a>
-                        </li>
-                        <li>
-                          <a href="#">Community</a>
-                        </li>
-                        <li>
-                          <a href="#">order history</a>
-                        </li>
-                        <li>
-                          <a href="#">my cart</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
     );
 };
