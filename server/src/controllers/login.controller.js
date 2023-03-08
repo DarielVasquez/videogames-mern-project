@@ -11,6 +11,8 @@ export default class LoginController {
       if (status === "success") {
         res.cookie("jwtToken", token, {
           path: "/",
+          secure: true,
+          sameSite: "none",
           httpOnly: true,
         });
       }
