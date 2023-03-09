@@ -6,18 +6,18 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 # Technologies Used
 
-• MERN stack (MongoDB, Express.js, React, Node.js)
-• Axios
-• Bootstrap
+• MERN stack (MongoDB, Express.js, React, Node.js)  
+• Axios  
+• Bootstrap  
 • Redux
 
 # Features
 
-• User authentication using JWT
-• Add new games to your list
-• Edit existing games on your list
-• Delete games from your list
-• View details about each game
+• User authentication using JWT  
+• Add new games to your list  
+• Edit existing games on your list  
+• Delete games from your list  
+• View details about each game  
 • Responsive design for mobile and desktop
 
 # Usage
