@@ -21,6 +21,8 @@ const Home = () => {
   const isLoading = useSelector((state) => state.fetchProducts.isLoading);
   // alerts
   const [alerts, setAlerts] = useState([]);
+  // login toggle
+  const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
 
   // fetch data
 
@@ -40,8 +42,10 @@ const Home = () => {
   const [clicked, setClicked] = useState(false);
 
   const handleAddFavorite = async ({ id }) => {
-    setClicked(true);
-    dispatch(fetchSingleProduct(id));
+    if (isLoggedIn) {
+      setClicked(true);
+      dispatch(fetchSingleProduct(id));
+    }
   };
 
   useEffect(() => {
@@ -136,15 +140,33 @@ const Home = () => {
                                     </ul>
                                   </div>
                                   <button
-                                    className="btn-cart welcome-add-cart center-text"
+                                    className="btn-cart welcome-add-cart center-text dropdown"
                                     onClick={() =>
                                       handleAddFavorite({
                                         id,
                                       })
                                     }
                                   >
-                                    <span className="lnr lnr-plus-circle"></span>
-                                    add <span>to</span> favorites
+                                    <a
+                                      className="dropdown-toggle"
+                                      data-toggle="dropdown"
+                                      style={{ color: "white" }}
+                                    >
+                                      <span className="lnr lnr-plus-circle"></span>
+                                      add <span>to</span> favorites
+                                    </a>
+                                    {!isLoggedIn && (
+                                      <ul className="dropdown-menu cart-list s-cate">
+                                        <li>
+                                          <Link
+                                            className="dropdown-item"
+                                            to={"/login"}
+                                          >
+                                            login
+                                          </Link>
+                                        </li>
+                                      </ul>
+                                    )}
                                   </button>
                                   <Link
                                     className="btn-cart welcome-add-cart welcome-more-info center-text"

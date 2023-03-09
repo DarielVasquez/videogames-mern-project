@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSingleProduct } from "../actions";
 import NoProduct from "./NoProduct";
@@ -10,6 +10,7 @@ import { addFavorite } from "../services/favorites";
 const SingleProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const singleProduct = useSelector(
     (state) => state.fetchSingleProduct.singleProduct
   );
@@ -17,6 +18,8 @@ const SingleProduct = () => {
   const error = useSelector((state) => state.fetchSingleProduct.error);
   // alerts
   const [alerts, setAlerts] = useState([]);
+  // login toggle
+  const isLoggedIn = useSelector((state) => state.isLoggedIn.isLoggedIn);
 
   useEffect(() => {
     if (id) dispatch(fetchSingleProduct(id));
@@ -29,8 +32,12 @@ const SingleProduct = () => {
       gameImg: image,
       gameDesc: description,
     };
-    const request = await addFavorite(data);
-    setAlerts((alerts) => [...alerts, request]);
+    if (isLoggedIn) {
+      const request = await addFavorite(data);
+      setAlerts((alerts) => [...alerts, request]);
+    } else {
+      navigate("/login");
+    }
   };
 
   // alert message
