@@ -10,6 +10,7 @@ export default class LoginController {
       });
       if (status === "success") {
         res.cookie("jwtToken", token, {
+          maxAge: 365 * 24 * 60 * 60 * 1000, // a year
           path: "/",
           secure: true,
           sameSite: "none",
