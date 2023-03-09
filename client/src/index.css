@@ -73,6 +73,12 @@ a {
   }
 }
 
+@media screen and (max-width: 1199px) {
+  .dropdown-menu {
+    left: 0;
+  }
+}
+
 @media screen and (max-width: 300px) {
   .btn-cart.welcome-add-cart.add-favorites-btn {
     width: 65%;
