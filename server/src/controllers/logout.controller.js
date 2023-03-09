@@ -4,7 +4,7 @@ export default class LogoutController {
       const token = req.cookies.jwtToken;
       let response;
       if (token) {
-        res.clearCookie("jwtToken");
+        res.clearCookie("jwtToken", { sameSite: "none", secure: true });
         response = {
           status: "success",
           message: "Logged out user",
