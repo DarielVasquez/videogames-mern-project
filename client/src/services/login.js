@@ -23,3 +23,14 @@ export const isUserLogged = async () => {
     console.error(error);
   }
 };
+
+export const loginUserOAuth = async (user) => {
+  try {
+    const response = await axios.post(`${API_URL}/oauth`, user, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};

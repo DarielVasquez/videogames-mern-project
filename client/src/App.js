@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 //Pages
 import Home from "./pages/Home";
 import Explore from "./pages/Explore";
@@ -16,21 +17,23 @@ import Footer from "./components/Footer";
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route exact path="/" element={<Home />}></Route>
-        <Route path="/explore" element={<Explore />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/about" element={<About />}></Route>
-        <Route path="/user" element={<User />}></Route>
-        <Route path="/product/:id" element={<SingleProduct />}></Route>
-        <Route path="/favorites" element={<Favorites />}></Route>
-        <Route path="*" element={<Error />}></Route>
-      </Routes>
-      <Footer />
-    </Router>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route exact path="/" element={<Home />}></Route>
+          <Route path="/explore" element={<Explore />}></Route>
+          <Route path="/login" element={<Login />}></Route>
+          <Route path="/signup" element={<SignUp />}></Route>
+          <Route path="/about" element={<About />}></Route>
+          <Route path="/user" element={<User />}></Route>
+          <Route path="/product/:id" element={<SingleProduct />}></Route>
+          <Route path="/favorites" element={<Favorites />}></Route>
+          <Route path="*" element={<Error />}></Route>
+        </Routes>
+        <Footer />
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

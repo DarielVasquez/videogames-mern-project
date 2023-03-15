@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser } from "../services/login";
+import { loginUser, loginUserOAuth } from "../services/login";
 import { loginUserAction } from "../actions";
 import { isUserLogged } from "../services/login";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -55,6 +56,14 @@ const Login = () => {
     }
     if (loginData.status === "success") {
       setErrors({});
+      dispatch(loginUserAction());
+      navigate("/");
+    }
+  };
+
+  const responseGoogle = async (response) => {
+    const loginResult = await loginUserOAuth(response);
+    if (loginResult.status === "success") {
       dispatch(loginUserAction());
       navigate("/");
     }
@@ -120,6 +129,12 @@ const Login = () => {
                 Create an Account
               </Link>
             </div>
+            <GoogleLogin
+              onSuccess={responseGoogle}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
           </form>
         </div>
       </div>
