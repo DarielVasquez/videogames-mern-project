@@ -54,6 +54,10 @@ const Favorites = () => {
 
   useEffect(() => {
     verifyUser();
+    const data = JSON.parse(localStorage.getItem("favoritesPerPage"));
+    if (data) {
+      setFavoritesPerPage(data);
+    }
   }, []);
 
   // sortable table
@@ -78,6 +82,7 @@ const Favorites = () => {
 
   const handleLimitChange = (event) => {
     setCurrentPage(1);
+    localStorage.setItem("favoritesPerPage", Number(event.target.value));
     setFavoritesPerPage(Number(event.target.value));
   };
 
