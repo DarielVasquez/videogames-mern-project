@@ -26,3 +26,4 @@ export const FETCH_QUERY_FAILURE = "FETCH_QUERY_FAILURE";
 //is logged in
 export const LOGIN_USER = "LOGIN_USER";
 export const LOGOUT_USER = "LOGOUT_USER";
+export const LOGIN_OAUTH = "LOGIN_OAUTH";

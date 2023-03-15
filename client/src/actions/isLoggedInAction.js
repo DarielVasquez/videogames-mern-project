@@ -1,4 +1,4 @@
-import { LOGIN_USER, LOGOUT_USER } from "./actionTypes";
+import { LOGIN_OAUTH, LOGIN_USER, LOGOUT_USER } from "./actionTypes";
 
 export const loginUserAction = () => {
   return {
@@ -9,5 +9,11 @@ export const loginUserAction = () => {
 export const logoutUserAction = () => {
   return {
     type: LOGOUT_USER,
+  };
+};
+
+export const loginOAuthAction = () => {
+  return {
+    type: LOGIN_OAUTH,
   };
 };
