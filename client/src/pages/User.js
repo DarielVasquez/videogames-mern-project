@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { getUserById, updateUser, removeUser } from "../services/user";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getUserById,
+  updateUser,
+  removeUser,
+  removeUserOAuth,
+} from "../services/user";
 import { loginUser } from "../services/login";
 import { logoutUser } from "../services/logout";
 import { logoutUserAction } from "../actions";
 import Alerts from "../components/Alerts";
+import Loading from "../components/Loading";
 
 const User = () => {
   const dispatch = useDispatch();
@@ -30,17 +36,21 @@ const User = () => {
   const [showRemovePassword, setShowRemovePassword] = useState(false);
   // alerts
   const [alerts, setAlerts] = useState([]);
+  // oauth
+  const [isLoading, setIsLoading] = useState(true);
+  const isOAuth = useSelector((state) => state.isLoggedIn.isOAuth);
 
-  // verify user
+  // add user data to form
 
-  const verifyUser = async () => {
+  const addUserData = async () => {
     const user = await getUserById();
     const { name, username, email } = user.user;
     setFormData({ ...formData, name: name, username: username, email: email });
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    verifyUser();
+    addUserData();
   }, []);
 
   // inputs form
@@ -64,7 +74,9 @@ const User = () => {
 
   const handleDeleteClick = async () => {
     const confirmPassword = removeUserPassword;
-    const data = await removeUser(confirmPassword);
+    const data = isOAuth
+      ? await removeUserOAuth()
+      : await removeUser(confirmPassword);
     if (data.status === "failure") {
       if (data.message.toLowerCase().includes("password")) {
         setErrors({ password: data.message });
@@ -122,7 +134,7 @@ const User = () => {
   // cancel edit button
 
   const handleCancelClick = () => {
-    verifyUser();
+    addUserData();
     setIsEditing(!isEditing);
     setErrors({});
   };
@@ -166,246 +178,266 @@ const User = () => {
     return () => clearTimeout(timer);
   }, [alerts]);
 
-  return (
-    <main>
-      <Alerts alerts={alerts} setAlerts={setAlerts} />
-      <div className="card">
-        <div className="card-container">
-          <div className="user-card">
-            <h1 className="user-card-title">User Profile</h1>
-            {
-              <>
-                <div className="card-margin">
-                  <label htmlFor="name">Name</label>
-                  <input
-                    type="text"
-                    className={`input-form ${errors.name ? "is-invalid" : ""}`}
-                    style={{ border: !isEditing && "1px solid white" }}
-                    readOnly={!isEditing}
-                    disabled={!isEditing}
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                  />
-                  {errors.name && (
-                    <div className="invalid-feedback">{errors.name}</div>
-                  )}
-                </div>
-                <div className="card-margin">
-                  <label htmlFor="username">Username</label>
-                  <input
-                    type="text"
-                    className={`input-form ${
-                      errors.username ? "is-invalid" : ""
-                    }`}
-                    style={{ border: !isEditing && "1px solid white" }}
-                    readOnly={!isEditing}
-                    disabled={!isEditing}
-                    id="username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                  />
-                  {errors.username && (
-                    <div className="invalid-feedback">{errors.username}</div>
-                  )}
-                </div>
-                <div className="card-margin">
-                  <label htmlFor="email">Email address</label>
-                  <input
-                    type="email"
-                    className={`input-form ${errors.email ? "is-invalid" : ""}`}
-                    style={{ border: !isEditing && "1px solid white" }}
-                    readOnly={!isEditing}
-                    disabled={!isEditing}
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
-                  {errors.email && (
-                    <div className="invalid-feedback">{errors.email}</div>
-                  )}
-                </div>
-                {isEditing && (
-                  <>
-                    <div className="card-margin">
-                      <label htmlFor="password">
-                        {changePassword ? `Old Password` : `Confirm Password:`}
-                      </label>
-                      <div className="card-pswd-input">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          className={`input-form ${
-                            errors.password ? "is-invalid" : ""
-                          }`}
-                          style={{
-                            border: !isEditing && "1px solid white",
-                            borderTopRightRadius: "0",
-                            borderBottomRightRadius: "0",
-                          }}
-                          readOnly={!isEditing}
-                          disabled={!isEditing}
-                          id="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                        />
-                        <div
-                          className="show-password"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          <span className="lnr lnr-eye"></span>
-                        </div>
-                      </div>
-                      {errors.password && (
-                        <div className="invalid-feedback">
-                          {errors.password}
-                        </div>
-                      )}
-                    </div>
-                    {changePassword && (
-                      <>
-                        <div className="card-margin">
-                          <label htmlFor="password">New Password</label>
-                          <div className="card-pswd-input">
-                            <input
-                              type={showConfirmPassword ? "text" : "password"}
-                              className={`input-form ${
-                                errors.newPassword ? "is-invalid" : ""
-                              }`}
-                              style={{
-                                border: !isEditing && "1px solid white",
-                                borderTopRightRadius: "0",
-                                borderBottomRightRadius: "0",
-                              }}
-                              readOnly={!isEditing}
-                              disabled={!isEditing}
-                              id="newPassword"
-                              name="newPassword"
-                              value={formData.newPassword}
-                              onChange={handleInputChange}
-                            />
-                            <div
-                              className="show-password"
-                              onClick={() =>
-                                setShowConfirmPassword(!showConfirmPassword)
-                              }
-                            >
-                              <span className="lnr lnr-eye"></span>
-                            </div>
+  if (isLoading) {
+    return <Loading />;
+  } else
+    return (
+      <main>
+        <Alerts alerts={alerts} setAlerts={setAlerts} />
+        <div className="card">
+          <div className="card-container">
+            <div className="user-card">
+              <h1 className="user-card-title">User Profile</h1>
+              {
+                <>
+                  <div className="card-margin">
+                    <label htmlFor="name">Name</label>
+                    <input
+                      type="text"
+                      className={`input-form ${
+                        errors.name ? "is-invalid" : ""
+                      }`}
+                      style={{ border: !isEditing && "1px solid white" }}
+                      readOnly={!isEditing}
+                      disabled={!isEditing}
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                    />
+                    {errors.name && (
+                      <div className="invalid-feedback">{errors.name}</div>
+                    )}
+                  </div>
+                  <div className="card-margin">
+                    <label htmlFor="username">Username</label>
+                    <input
+                      type="text"
+                      className={`input-form ${
+                        errors.username ? "is-invalid" : ""
+                      }`}
+                      style={{ border: !isEditing && "1px solid white" }}
+                      readOnly={!isEditing}
+                      disabled={!isEditing}
+                      id="username"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleInputChange}
+                    />
+                    {errors.username && (
+                      <div className="invalid-feedback">{errors.username}</div>
+                    )}
+                  </div>
+                  <div className="card-margin">
+                    <label htmlFor="email">Email address</label>
+                    <input
+                      type="email"
+                      className={`input-form ${
+                        errors.email ? "is-invalid" : ""
+                      }`}
+                      style={{ border: !isEditing && "1px solid white" }}
+                      readOnly={!isEditing}
+                      disabled={!isEditing}
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                    {errors.email && (
+                      <div className="invalid-feedback">{errors.email}</div>
+                    )}
+                  </div>
+                  {isEditing && (
+                    <>
+                      <div className="card-margin">
+                        <label htmlFor="password">
+                          {changePassword
+                            ? `Old Password`
+                            : `Confirm Password:`}
+                        </label>
+                        <div className="card-pswd-input">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            className={`input-form ${
+                              errors.password ? "is-invalid" : ""
+                            }`}
+                            style={{
+                              border: !isEditing && "1px solid white",
+                              borderTopRightRadius: "0",
+                              borderBottomRightRadius: "0",
+                            }}
+                            readOnly={!isEditing}
+                            disabled={!isEditing}
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                          />
+                          <div
+                            className="show-password"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <span className="lnr lnr-eye"></span>
                           </div>
-                          {errors.newPassword && (
-                            <div className="invalid-feedback">
-                              {errors.newPassword}
-                            </div>
-                          )}
                         </div>
-                      </>
+                        {errors.password && (
+                          <div className="invalid-feedback">
+                            {errors.password}
+                          </div>
+                        )}
+                      </div>
+                      {changePassword && (
+                        <>
+                          <div className="card-margin">
+                            <label htmlFor="password">New Password</label>
+                            <div className="card-pswd-input">
+                              <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                className={`input-form ${
+                                  errors.newPassword ? "is-invalid" : ""
+                                }`}
+                                style={{
+                                  border: !isEditing && "1px solid white",
+                                  borderTopRightRadius: "0",
+                                  borderBottomRightRadius: "0",
+                                }}
+                                readOnly={!isEditing}
+                                disabled={!isEditing}
+                                id="newPassword"
+                                name="newPassword"
+                                value={formData.newPassword}
+                                onChange={handleInputChange}
+                              />
+                              <div
+                                className="show-password"
+                                onClick={() =>
+                                  setShowConfirmPassword(!showConfirmPassword)
+                                }
+                              >
+                                <span className="lnr lnr-eye"></span>
+                              </div>
+                            </div>
+                            {errors.newPassword && (
+                              <div className="invalid-feedback">
+                                {errors.newPassword}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                      <div
+                        onClick={() => setChangePassword(!changePassword)}
+                        className="btn btn-warning user-change-pswd-button"
+                      >
+                        {!changePassword ? "Change Password" : "Cancel Change"}
+                      </div>
+                    </>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    {!isOAuth && (
+                      <div
+                        className="btn btn-primary mr-2 user-btn-primary"
+                        onClick={isEditing ? handleSaveClick : handleEditClick}
+                      >
+                        {isEditing ? "Save" : "Edit"}
+                      </div>
                     )}
                     <div
-                      onClick={() => setChangePassword(!changePassword)}
-                      className="btn btn-warning user-change-pswd-button"
+                      className={`btn btn-${
+                        isEditing ? "secondary" : "danger"
+                      } user-btn-secondary`}
+                      style={{ marginLeft: isOAuth ? "0px" : "10px" }}
+                      onClick={() =>
+                        isEditing
+                          ? handleCancelClick()
+                          : setShowModal(!showModal)
+                      }
                     >
-                      {!changePassword ? "Change Password" : "Cancel Change"}
+                      {isEditing ? "Cancel" : "Delete"}
                     </div>
+                  </div>
+                </>
+              }
+            </div>
+          </div>
+        </div>
+        <div
+          className={`modal${showModal ? " d-block modal-backdrop" : ""}`}
+          tabIndex="-1"
+          role="dialog"
+          style={{ zIndex: "9999" }}
+        >
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Delete</h5>
+                <button
+                  type="button"
+                  className="close"
+                  aria-label="Close"
+                  onClick={() => setShowModal(!showModal)}
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                {!isOAuth && (
+                  <>
+                    Confirm password:
+                    <div className="modal-body-input">
+                      <input
+                        type={showRemovePassword ? "text" : "password"}
+                        className={`input-form ${
+                          errors.password ? "is-invalid" : ""
+                        }`}
+                        style={{
+                          borderTopRightRadius: "0",
+                          borderBottomRightRadius: "0",
+                        }}
+                        id="password"
+                        name="password"
+                        value={removeUserPassword}
+                        onChange={(e) => setRemoveUserPassword(e.target.value)}
+                      />
+                      <div
+                        className="show-password"
+                        onClick={() =>
+                          setShowRemovePassword(!showRemovePassword)
+                        }
+                      >
+                        <span className="lnr lnr-eye"></span>
+                      </div>
+                    </div>
+                    {errors.password && (
+                      <div className="invalid-feedback">{errors.password}</div>
+                    )}
                   </>
                 )}
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <div
-                    className="btn btn-primary mr-2 user-btn-primary"
-                    onClick={isEditing ? handleSaveClick : handleEditClick}
-                  >
-                    {isEditing ? "Save" : "Edit"}
-                  </div>
-                  <div
-                    className={`btn btn-${
-                      isEditing ? "secondary" : "danger"
-                    } user-btn-secondary`}
-                    onClick={() =>
-                      isEditing ? handleCancelClick() : setShowModal(!showModal)
-                    }
-                  >
-                    {isEditing ? "Cancel" : "Delete"}
-                  </div>
-                </div>
-              </>
-            }
-          </div>
-        </div>
-      </div>
-      <div
-        className={`modal${showModal ? " d-block modal-backdrop" : ""}`}
-        tabIndex="-1"
-        role="dialog"
-        style={{ zIndex: "9999" }}
-      >
-        <div className="modal-dialog modal-dialog-centered" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Delete</h5>
-              <button
-                type="button"
-                className="close"
-                aria-label="Close"
-                onClick={() => setShowModal(!showModal)}
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              Confirm password:
-              <div className="modal-body-input">
-                <input
-                  type={showRemovePassword ? "text" : "password"}
-                  className={`input-form ${
-                    errors.password ? "is-invalid" : ""
-                  }`}
-                  style={{
-                    borderTopRightRadius: "0",
-                    borderBottomRightRadius: "0",
-                  }}
-                  id="password"
-                  name="password"
-                  value={removeUserPassword}
-                  onChange={(e) => setRemoveUserPassword(e.target.value)}
-                />
-                <div
-                  className="show-password"
-                  onClick={() => setShowRemovePassword(!showRemovePassword)}
-                >
-                  <span className="lnr lnr-eye"></span>
-                </div>
+                <p style={{ textTransform: "none", margin: "5px" }}>
+                  Are you sure you want to delete this account?
+                </p>
               </div>
-              {errors.password && (
-                <div className="invalid-feedback">{errors.password}</div>
-              )}
-              <p style={{ textTransform: "none", margin: "5px" }}>
-                Are you sure you want to delete this account?
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowModal(!showModal)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={handleDeleteClick}
-              >
-                Delete
-              </button>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowModal(!showModal)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={handleDeleteClick}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
-  );
+      </main>
+    );
 };
 
 export default User;

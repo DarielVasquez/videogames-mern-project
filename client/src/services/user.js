@@ -48,3 +48,14 @@ export const removeUser = async (confirmPassword) => {
     console.error(error);
   }
 };
+
+export const removeUserOAuth = async () => {
+  try {
+    const response = await axios.delete(`${API_URL}/oauth`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
