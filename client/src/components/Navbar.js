@@ -2,9 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchQuery } from "../actions";
-import { loginUserAction, logoutUserAction } from "../actions";
 import LogoutModal from "./LogoutModal";
-import { isUserLogged } from "../services/login";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -36,21 +34,6 @@ const Navbar = () => {
       setShowResults(false);
     }
   }, [searchValue]);
-
-  // verify whether user is logged in or not
-
-  const verifyUser = async () => {
-    const user = await isUserLogged();
-    if (user.status === "failure") {
-      dispatch(logoutUserAction());
-    } else {
-      dispatch(loginUserAction());
-    }
-  };
-
-  useEffect(() => {
-    verifyUser();
-  }, []);
 
   return (
     <nav className="top-area">

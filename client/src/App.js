@@ -14,10 +14,12 @@ import Favorites from "./pages/Favorites";
 //Components
 import Navbar from "./components/Navbar.js";
 import Footer from "./components/Footer";
+import AuthVerifier from "./components/AuthVerifier";
 
 function App() {
   return (
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+      <AuthVerifier />
       <Router>
         <Navbar />
         <Routes>
