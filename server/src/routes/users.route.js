@@ -12,4 +12,6 @@ router
   .patch(verifyToken, checkPassword, UsersController.apiUpdateUser)
   .delete(verifyToken, checkPassword, UsersController.apiRemoveUser);
 
+router.route("/oauth").delete(verifyToken, UsersController.apiRemoveUser);
+
 export default router;

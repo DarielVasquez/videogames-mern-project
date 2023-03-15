@@ -8,4 +8,6 @@ router
   .get(LoginController.apiGetLog)
   .post(LoginController.apiLoginUser);
 
+router.route("/oauth").post(LoginController.apiOAuth);
+
 export default router;

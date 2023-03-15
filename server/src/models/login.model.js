@@ -52,4 +52,33 @@ export default class LoginModel {
       };
     }
   }
+
+  static async loginOAuth({ data, date }) {
+    let _id;
+    const { name, username, email, picture } = data;
+    // retrieve the user from the database
+    const user = await users.findOne({ username });
+    //check if the user exists
+    if (!user) {
+      const result = await users.insertOne({
+        name: name,
+        username: username,
+        email: email,
+        picture: picture,
+        date_created: date,
+        favorites: [],
+      });
+      _id = result.insertedId;
+    }
+    const payload = {
+      _id: user ? user._id : _id,
+      username,
+    };
+    const token = jwt.sign(payload, process.env.SECRET_KEY);
+    return {
+      token: token,
+      status: "success",
+      message: "The user has been authenticated",
+    };
+  }
 }
