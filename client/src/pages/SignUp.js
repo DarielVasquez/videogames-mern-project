@@ -227,9 +227,15 @@ const SignUp = () => {
             <button type="submit" className="submit-button">
               Sign-Up
             </button>
+            <div className="horizontal-line-container margin-bottom">
+              <hr className="horizontal-line-hr" />
+              <span className="no-uppercase">or instead</span>
+              <hr className="horizontal-line-hr" />
+            </div>
             <div className="center-text">
+              <span className="no-uppercase">Already have an Account? </span>
               <Link to={"/login"} style={{ textTransform: "none" }}>
-                Already have an Account?
+                Login
               </Link>
             </div>
           </form>

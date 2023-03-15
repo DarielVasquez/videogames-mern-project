@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { loginUser, loginUserOAuth } from "../services/login";
-import { loginUserAction } from "../actions";
+import { loginUserAction, loginOAuthAction } from "../actions";
 import { isUserLogged } from "../services/login";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -64,7 +64,7 @@ const Login = () => {
   const responseGoogle = async (response) => {
     const loginResult = await loginUserOAuth(response);
     if (loginResult.status === "success") {
-      dispatch(loginUserAction());
+      dispatch(loginOAuthAction());
       navigate("/");
     }
   };
@@ -124,17 +124,37 @@ const Login = () => {
             <button type="submit" className="submit-button">
               Login
             </button>
+            <div className="horizontal-line-container margin-bottom">
+              <hr className="horizontal-line-hr" />
+              <span className="no-uppercase">or login with</span>
+              <hr className="horizontal-line-hr" />
+            </div>
+            <div
+              className="margin-bottom"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <GoogleLogin
+                onSuccess={responseGoogle}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
+              />
+            </div>
+            <div className="horizontal-line-container margin-bottom">
+              <hr className="horizontal-line-hr" />
+              <span className="no-uppercase">or instead</span>
+              <hr className="horizontal-line-hr" />
+            </div>
             <div className="center-text">
+              <span className="no-uppercase">Don't have an account? </span>
               <Link to={"/signup"} style={{ textTransform: "none" }}>
                 Create an Account
               </Link>
             </div>
-            <GoogleLogin
-              onSuccess={responseGoogle}
-              onError={() => {
-                console.log("Login Failed");
-              }}
-            />
           </form>
         </div>
       </div>
