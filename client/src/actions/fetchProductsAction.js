@@ -36,11 +36,13 @@ export const fetchProducts = () => {
   return async (dispatch) => {
     dispatch(fetchProductsStart());
     try {
-      const latestProductsResponse = await fetch(latestProductsUrl);
-      const featuredProductsResponse = await fetch(featuredProductsUrl);
-      const latestProducts = await latestProductsResponse.json();
-      const featuredProducts = await featuredProductsResponse.json();
-      dispatch(fetchProductsSuccess(latestProducts, featuredProducts));
+      const responses = await Promise.all([
+        fetch(latestProductsUrl),
+        fetch(featuredProductsUrl),
+      ]);
+      const dataPromises = responses.map((response) => response.json());
+      const data = await Promise.all(dataPromises);
+      dispatch(fetchProductsSuccess(data[0], data[1]));
     } catch (error) {
       dispatch(fetchProductsFailure(error.message));
     }

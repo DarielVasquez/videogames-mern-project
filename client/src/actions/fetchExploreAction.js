@@ -43,22 +43,15 @@ export const fetchExplore = () => {
   return async (dispatch) => {
     dispatch(fetchExploreStart());
     try {
-      const popularProductsResponse = await fetch(popularProductsUrl);
-      const bestProductsResponse = await fetch(bestProductsUrl);
-      const actionProductsResponse = await fetch(actionProductsUrl);
-      const indieProductsResponse = await fetch(indieProductsUrl);
-      const popularProducts = await popularProductsResponse.json();
-      const bestProducts = await bestProductsResponse.json();
-      const actionProducts = await actionProductsResponse.json();
-      const indieProducts = await indieProductsResponse.json();
-      dispatch(
-        fetchExploreSuccess(
-          popularProducts,
-          bestProducts,
-          actionProducts,
-          indieProducts
-        )
-      );
+      const responses = await Promise.all([
+        fetch(popularProductsUrl),
+        fetch(bestProductsUrl),
+        fetch(actionProductsUrl),
+        fetch(indieProductsUrl),
+      ]);
+      const dataPromises = responses.map((response) => response.json());
+      const data = await Promise.all(dataPromises);
+      dispatch(fetchExploreSuccess(data[0], data[1], data[2], data[3]));
     } catch (error) {
       dispatch(fetchExploreFailure(error.message));
     }
