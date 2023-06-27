@@ -13,7 +13,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 # Features
 
-• User authentication using JWT  
+• User authentication using JWT and Google OAuth    
 • Add new games to your list  
 • Edit existing games on your list  
 • Delete games from your list  
