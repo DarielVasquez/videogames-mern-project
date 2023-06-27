@@ -19,6 +19,7 @@ const Favorites = () => {
   const [filteredFavorites, setFilteredFavorites] = useState([]);
   // alerts
   const [alerts, setAlerts] = useState([]);
+  const values = [5, 10, 15, 20, 25, 50, 100];
 
   // remove favorite
 
@@ -134,11 +135,17 @@ const Favorites = () => {
                 value={favoritesPerPage}
                 onChange={handleLimitChange}
               >
-                <option className="dropdown-item" value={5}>
-                  5
-                </option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
+                {values.map((val, i) => {
+                  return (
+                    <option
+                      className={i === 0 ? "dropdown-item" : ""}
+                      key={i}
+                      value={val}
+                    >
+                      {val}
+                    </option>
+                  );
+                })}
               </select>
               {` entries`}
             </div>
