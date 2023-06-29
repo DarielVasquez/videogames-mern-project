@@ -336,8 +336,16 @@ const User = () => {
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     {!isOAuth && (
                       <div
-                        className="btn btn-primary mr-2 user-btn-primary"
-                        onClick={isEditing ? handleSaveClick : handleEditClick}
+                        className={`btn btn-primary mr-2 user-btn-primary ${
+                          formData.username === "admin" && "disabled"
+                        }`}
+                        onClick={() =>
+                          formData.username === "admin"
+                            ? console.log("Admin account cannot be modified")
+                            : isEditing
+                            ? handleSaveClick()
+                            : handleEditClick()
+                        }
                       >
                         {isEditing ? "Save" : "Edit"}
                       </div>
@@ -345,10 +353,14 @@ const User = () => {
                     <div
                       className={`btn btn-${
                         isEditing ? "secondary" : "danger"
-                      } user-btn-secondary`}
+                      } user-btn-secondary ${
+                        formData.username === "admin" && "disabled"
+                      }`}
                       style={{ marginLeft: isOAuth ? "0px" : "10px" }}
                       onClick={() =>
-                        isEditing
+                        formData.username === "admin"
+                          ? console.log("Admin account cannot be deleted")
+                          : isEditing
                           ? handleCancelClick()
                           : setShowModal(!showModal)
                       }
