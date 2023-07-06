@@ -718,7 +718,7 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   justify-content: center;
   height: 100%;
   padding: 50px;
-  margin-top: 20px;
+  margin-top: 120px;
   background-color: #f8f8f8;
 }
 
@@ -729,13 +729,22 @@ nav.navbar.bootsnav li.dropdown ul.dropdown-menu > li > a {
   margin-bottom: 40px;
 }
 
+.about-heading {
+  padding: 30px;
+  font-size: 24px;
+}
+
 .about-text {
   font-size: 18px;
   line-height: 1.5;
-  max-width: 600px;
-  text-align: center;
+  max-width: 60ch;
+  text-align: start;
   margin-bottom: 40px;
   text-transform: none;
+}
+
+.about-text li {
+  list-style-type: circle;
 }
 
 .about-link {
